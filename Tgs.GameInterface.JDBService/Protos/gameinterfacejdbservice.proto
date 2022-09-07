@@ -1,0 +1,107 @@
+syntax = "proto3";
+
+import "phoenix/protobuf/decimal.proto";
+import "google/protobuf/timestamp.proto";
+
+option csharp_namespace = "Tgs.GameInterface.JDBService.Protos";
+
+package gameinterfacejdbservice;
+
+// The greeting service definition.
+service GameInterfaceJDBService {
+  // Sends a greeting
+  rpc PlayerBalance (PlayerBalanceRequest) returns (PlayerBalanceReply);
+  rpc PlayerCreate (PlayerCreateRequest) returns (BaseReply);
+  rpc PlayerKick (PlayerKickRequest) returns (BaseReply);
+  rpc FundOut(FundRequest) returns (FundReply);
+  rpc FundIn (FundRequest) returns (FundReply);
+  rpc FundStatus(FundStatusRequest) returns (FundStatusReply);
+  rpc GameUrl (GameUrlRequest) returns (GameUrlReply);
+}
+
+// The request message containing the user's name.
+message PlayerBalanceRequest {
+	string api_url = 1;
+	string domain = 2;
+	string partner_key = 3;
+	string partner_iv = 4;
+	string agent = 5;
+	string player_code= 6;
+}
+
+message PlayerCreateRequest {
+	string api_url = 1;
+	string domain = 2;
+	string partner_key = 3;
+	string partner_iv = 4;
+	string agent = 5;
+	string player_code= 6;
+}
+
+message PlayerKickRequest {
+	string api_url = 1;
+	string domain = 2;
+	string partner_key = 3;
+	string partner_iv = 4;
+	string agent = 5;
+	string player_code= 6;
+}
+
+message FundRequest {
+	string api_url = 1;
+	string domain = 2;
+	string partner_key = 3;
+	string partner_iv = 4;
+	string agent = 5;
+	string player_code= 6;
+	string serial_no = 7;
+	phoenix.protobuf.DecimalValue amount = 8;
+}
+
+message FundStatusRequest {
+	string api_url = 1;
+	string domain = 2;
+	string partner_key = 3;
+	string partner_iv = 4;
+	string agent = 5;
+	string serial_no = 6;
+}
+
+message GameUrlRequest {
+	string api_url = 1;
+	string domain = 2;
+	string partner_key = 3;
+	string partner_iv = 4;
+	string player_code = 5;
+	string game_type = 6;
+	string machine_type = 7;
+	string lang = 8;
+}
+
+// The response message containing the greetings.
+message BaseReply{
+	bool status = 1;
+}
+
+message PlayerBalanceReply {
+	bool is_player_exist = 1;
+	phoenix.protobuf.DecimalValue balance = 2;
+}
+
+message FundReply {
+	int64 pid = 1;
+    string serial_no = 2;
+    google.protobuf.Timestamp pay_date = 3; 
+    phoenix.protobuf.DecimalValue amount = 4;
+    phoenix.protobuf.DecimalValue user_balance = 5;
+	phoenix.protobuf.DecimalValue agent_cash_balance = 6;
+}
+
+message FundStatusReply {
+	bool is_order_exist = 1;
+}
+
+message GameUrlReply {
+	bool is_player_exist = 1;
+	string game_url = 2;
+}
