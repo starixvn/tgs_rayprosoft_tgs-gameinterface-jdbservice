@@ -41,8 +41,8 @@ namespace Tgs.GameInterface.JDBService.Client
             string partnerKey,
             string partnerIV,
             string playerCode,
-            string gType,
-            string mType,
+            string gameType,
+            string machineType,
             string lang,
             CancellationToken cancellationToken = default);
 

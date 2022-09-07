@@ -96,7 +96,34 @@ namespace Tgs.GameInterface.JDBService.Client
             return reply.IsOrderExist;
         }
 
-        public ValueTask<GameUrlReply> GameUrlAsync(Uri apiUrl, string domain, string partnerKey, string partnerIV, string playerCode, string gType, string mType, string lang, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public async ValueTask<GameUrlReply> GameUrlAsync(
+            Uri apiUrl,
+            string domain,
+            string partnerKey,
+            string partnerIV,
+            string playerCode,
+            string gameType,
+            string machineType,
+            string lang,
+            CancellationToken cancellationToken = default)
+        {
+            var request = new GameUrlRequest()
+            {
+                ApiUrl = apiUrl.ToString(),
+                Domain = domain,
+                PartnerKey = partnerKey,
+                PartnerIv = partnerIV,
+                PlayerCode = playerCode,
+                GameType = gameType,
+                MachineType = machineType,
+                Lang = lang
+            };
+            return await _client
+                .GameUrlAsync(
+                    request: request,
+                    cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+        }
 
         public async ValueTask<PlayerBalanceReply> PlayerBalanceAsync(
             Uri apiUrl,
