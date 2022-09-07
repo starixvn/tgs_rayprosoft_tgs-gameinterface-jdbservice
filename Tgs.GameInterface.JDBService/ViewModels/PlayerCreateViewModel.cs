@@ -1,0 +1,19 @@
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Tgs.GameInterface.JDBService.ViewModels;
+
+public record PlayerCreateViewModel
+{
+    [Required]
+    public Uri ApiUrl { get; init; } = default!;
+    [Required]
+    public string Domain { get; init; } = default!;
+    [Required]
+    public string PartnerKey { get; init; } = default!;
+    [Required]
+    public string PartnerIV { get; init; } = default!;
+    [Required]
+    public string Agent { get; init; } = default!;
+    [Required]
+    public string PlayerCode { get; init; } = default!;
+}
