@@ -128,10 +128,10 @@ message GameHistoryInfo {
     string external_game_id = 3;
 	google.protobuf.Timestamp external_created_on = 4;
 	google.protobuf.Timestamp external_closed_on = 5;
-	phoenix.protobuf.DecimalValue bet = 8;
-	phoenix.protobuf.DecimalValue valid_bet = 9;
-	phoenix.protobuf.DecimalValue player_win_loss = 10;
-	phoenix.protobuf.DecimalValue turnover = 11;
-	phoenix.protobuf.DecimalValue settle = 12;
-	string additional_data = 13;
+	phoenix.protobuf.DecimalValue bet = 6;
+	phoenix.protobuf.DecimalValue valid_bet = 7;
+	phoenix.protobuf.DecimalValue player_win_loss = 8;
+	phoenix.protobuf.DecimalValue turnover = 9;
+	phoenix.protobuf.DecimalValue settle = 10;
+	string additional_data = 11;
 }
