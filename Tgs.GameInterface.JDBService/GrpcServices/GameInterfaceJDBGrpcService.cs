@@ -1,6 +1,7 @@
 ﻿using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Tgs.GameInterface.JDBService.Core.ApplicationServices;
+using Tgs.GameInterface.JDBService.Core.Models;
 using Tgs.GameInterface.JDBService.Protos;
 using Tgs.ServiceUtility;
 
@@ -15,6 +16,8 @@ public class GameInterfaceJDBGrpcService : GameInterfaceJDBService.GameInterface
     private readonly IGetService<FundOutQuery, FundResult> _fundOutService;
     private readonly IGetService<FundStatusQuery, bool> _fundStatusService;
     private readonly IGetService<GameUrlQuery, GameUrlResult> _gameUrlService;
+    private readonly IQueryService<GameHistoryQuery, GameHistoryResult> _gameHistoryService;
+    private readonly IQueryService<GameOldHistoryQuery, GameHistoryResult> _gameOldHistoryService;
 
     public GameInterfaceJDBGrpcService(
         IGetService<PlayerBalanceQuery, PlayerBalanceResult> playerBalanceService,
@@ -23,7 +26,9 @@ public class GameInterfaceJDBGrpcService : GameInterfaceJDBService.GameInterface
         IGetService<FundInQuery, FundResult> fundInService,
         IGetService<FundOutQuery, FundResult> fundOutService,
         IGetService<FundStatusQuery, bool> fundStatusService,
-        IGetService<GameUrlQuery, GameUrlResult> gameUrlService
+        IGetService<GameUrlQuery, GameUrlResult> gameUrlService,
+        IQueryService<GameHistoryQuery, GameHistoryResult> gameHistoryService,
+        IQueryService<GameOldHistoryQuery, GameHistoryResult> gameOldHistoryService
         )
     {
         _playerBalanceService = playerBalanceService ?? throw new ArgumentNullException(nameof(playerBalanceService));
@@ -33,6 +38,8 @@ public class GameInterfaceJDBGrpcService : GameInterfaceJDBService.GameInterface
         _fundOutService = fundOutService ?? throw new ArgumentNullException(nameof(fundOutService));
         _fundStatusService = fundStatusService ?? throw new ArgumentNullException(nameof(fundStatusService));
         _gameUrlService = gameUrlService ?? throw new ArgumentNullException(nameof(gameUrlService));
+        _gameHistoryService = gameHistoryService ?? throw new ArgumentNullException(nameof(gameHistoryService));
+        _gameOldHistoryService = gameOldHistoryService ?? throw new ArgumentNullException(nameof(gameOldHistoryService));
     }
 
     public override async Task<FundReply> FundIn(FundRequest request, ServerCallContext context)
@@ -40,8 +47,8 @@ public class GameInterfaceJDBGrpcService : GameInterfaceJDBService.GameInterface
         var query = new FundInQuery(
         new Uri(request.ApiUrl),
         request.Domain,
-        request.PartnerKey,
-        request.PartnerIv,
+        request.AesKey,
+        request.AesIV,
         request.Agent,
         request.PlayerCode,
         request.SerialNo,
@@ -69,8 +76,8 @@ public class GameInterfaceJDBGrpcService : GameInterfaceJDBService.GameInterface
         var query = new FundOutQuery(
         new Uri(request.ApiUrl),
         request.Domain,
-        request.PartnerKey,
-        request.PartnerIv,
+        request.AesKey,
+        request.AesIV,
         request.Agent,
         request.PlayerCode,
         request.SerialNo,
@@ -98,8 +105,8 @@ public class GameInterfaceJDBGrpcService : GameInterfaceJDBService.GameInterface
         var query = new FundStatusQuery(
         new Uri(request.ApiUrl),
         request.Domain,
-        request.PartnerKey,
-        request.PartnerIv,
+        request.AesKey,
+        request.AesIV,
         request.Agent,
         request.SerialNo);
 
@@ -115,13 +122,101 @@ public class GameInterfaceJDBGrpcService : GameInterfaceJDBService.GameInterface
         };
     }
 
+    public override async Task<GameHistoryReply> GameHistory(GameHistoryRequest request, ServerCallContext context)
+    {
+        var query = new GameHistoryQuery(
+        new Uri(request.ApiUrl),
+        request.Domain,
+        request.AesKey,
+        request.AesIV,
+        request.Agent,
+        request.StartTime.ToDateTime(),
+        request.EndTime.ToDateTime());
+
+        var results = await _gameHistoryService
+            .QueryAsync(
+                query: query,
+                cancellationToken: context.CancellationToken)
+            .ToArrayAsync()
+            .ConfigureAwait(false);
+
+        var reply = new GameHistoryReply();
+
+        if (results.Any())
+        {
+            foreach (var result in results)
+            {
+                reply.Items.Add(new GameHistoryInfo()
+                {
+                    PlayerCode = result.PlayerCode,
+                    ExternalRoundId = result.ExternalRoundId,
+                    ExternalGameId = result.ExternalGameId,
+                    ExternalCreatedOn = result.ExternalCreatedOn.ToTimestamp(),
+                    ExternalClosedOn = result.ExternalClosedOn.ToTimestamp(),
+                    Bet = result.Bet,
+                    ValidBet = result.ValidBet,
+                    PlayerWinLoss = result.PlayerWinLoss,
+                    Turnover = result.Turnover,
+                    Settle = result.Settle,
+                    AdditionalData = result.AdditionalData
+                });
+            }
+        }
+
+        return reply;
+    }
+
+    public override async Task<GameHistoryReply> GameOldHistory(GameHistoryRequest request, ServerCallContext context)
+    {
+        var query = new GameOldHistoryQuery(
+        new Uri(request.ApiUrl),
+        request.Domain,
+        request.AesKey,
+        request.AesIV,
+        request.Agent,
+        request.StartTime.ToDateTime(),
+        request.EndTime.ToDateTime());
+
+        var results = await _gameOldHistoryService
+            .QueryAsync(
+                query: query,
+                cancellationToken: context.CancellationToken)
+            .ToArrayAsync()
+            .ConfigureAwait(false);
+
+        var reply = new GameHistoryReply();
+
+        if (results.Any())
+        {
+            foreach (var result in results)
+            {
+                reply.Items.Add(new GameHistoryInfo()
+                {
+                    PlayerCode = result.PlayerCode,
+                    ExternalRoundId = result.ExternalRoundId,
+                    ExternalGameId = result.ExternalGameId,
+                    ExternalCreatedOn = result.ExternalCreatedOn.ToTimestamp(),
+                    ExternalClosedOn = result.ExternalClosedOn.ToTimestamp(),
+                    Bet = result.Bet,
+                    ValidBet = result.ValidBet,
+                    PlayerWinLoss = result.PlayerWinLoss,
+                    Turnover = result.Turnover,
+                    Settle = result.Settle,
+                    AdditionalData = result.AdditionalData
+                });
+            }
+        }
+
+        return reply;
+    }
+
     public override async Task<GameUrlReply> GameUrl(GameUrlRequest request, ServerCallContext context)
     {
         var query = new GameUrlQuery(
         new Uri(request.ApiUrl),
         request.Domain,
-        request.PartnerKey,
-        request.PartnerIv,
+        request.AesKey,
+        request.AesIV,
         request.PlayerCode,
         request.GameType,
         request.MachineType,
@@ -145,8 +240,8 @@ public class GameInterfaceJDBGrpcService : GameInterfaceJDBService.GameInterface
         var query = new PlayerBalanceQuery(
         new Uri(request.ApiUrl),
         request.Domain,
-        request.PartnerKey,
-        request.PartnerIv,
+        request.AesKey,
+        request.AesIV,
         request.Agent,
         request.PlayerCode);
 
@@ -168,8 +263,8 @@ public class GameInterfaceJDBGrpcService : GameInterfaceJDBService.GameInterface
         var command = new PlayerCreateCommand(
         new Uri(request.ApiUrl),
         request.Domain,
-        request.PartnerKey,
-        request.PartnerIv,
+        request.AesKey,
+        request.AesIV,
         request.Agent,
         request.PlayerCode);
 
@@ -190,8 +285,8 @@ public class GameInterfaceJDBGrpcService : GameInterfaceJDBService.GameInterface
         var command = new PlayerKickCommand(
         new Uri(request.ApiUrl),
         request.Domain,
-        request.PartnerKey,
-        request.PartnerIv,
+        request.AesKey,
+        request.AesIV,
         request.Agent,
         request.PlayerCode);
 

@@ -16,8 +16,8 @@ public class GetTokenUnitTest
     {
         var apiUrl = new Uri("http://api.jygrq.com");
         var domain = "ZF";
-        var partnerKey = "831057181dd07807";
-        var partnerIV = "193a3159afebee65";
+        var aesKey = "831057181dd07807";
+        var aesIV = "193a3159afebee65";
         var playerCode = "4ucmqplxhfoe";
         var gameType = "7";
         var machineType = "7001";
@@ -53,8 +53,8 @@ public class GetTokenUnitTest
         var jsonString = JsonSerializer.Serialize(data);
         _ = fakeAesCryptography.GetAesEncryptAsync(
             Arg.Is(jsonString),
-            Arg.Is(partnerKey),
-            Arg.Is(partnerIV)).Returns(encryptedData);
+            Arg.Is(aesKey),
+            Arg.Is(aesIV)).Returns(encryptedData);
 
         var url = new Uri(apiUrl, "/apiRequest.do");
 
@@ -74,8 +74,8 @@ public class GetTokenUnitTest
         var actual = await client.GetTokenAsync(
                 apiUrl,
                 domain,
-                partnerKey,
-                partnerIV,
+                aesKey,
+                aesIV,
                 playerCode,
                 gameType,
                 machineType,
@@ -92,8 +92,8 @@ public class GetTokenUnitTest
     {
         var apiUrl = new Uri("http://api.jygrq.com");
         var domain = "ZF";
-        var partnerKey = "831057181dd07807";
-        var partnerIV = "193a3159afebee65";
+        var aesKey = "831057181dd07807";
+        var aesIV = "193a3159afebee65";
         var playerCode = "4ucmqplxhfoe";
         var gameType = "7";
         var machineType = "7001";
@@ -129,8 +129,8 @@ public class GetTokenUnitTest
         var jsonString = JsonSerializer.Serialize(data);
         _ = fakeAesCryptography.GetAesEncryptAsync(
             Arg.Is(jsonString),
-            Arg.Is(partnerKey),
-            Arg.Is(partnerIV)).Returns(encryptedData);
+            Arg.Is(aesKey),
+            Arg.Is(aesIV)).Returns(encryptedData);
 
         var url = new Uri(apiUrl, "/apiRequest.do");
 
@@ -150,8 +150,8 @@ public class GetTokenUnitTest
         var actual = await client.GetTokenAsync(
                 apiUrl,
                 domain,
-                partnerKey,
-                partnerIV,
+                aesKey,
+                aesIV,
                 playerCode,
                 gameType,
                 machineType,

@@ -3,7 +3,7 @@
 public record FundStatusQuery(
     Uri ApiUrl,
     string Domain,
-    string PartnerKey,
-    string PartnerIV,
+    string AesKey,
+    string AesIV,
     string Agent,
     string SerialNo);

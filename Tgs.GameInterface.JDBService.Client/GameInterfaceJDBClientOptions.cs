@@ -1,7 +1,6 @@
-﻿namespace Tgs.GameInterface.JDBService.Client
+﻿namespace Tgs.GameInterface.JDBService.Client;
+
+public class GameInterfaceJDBClientOptions
 {
-    public class GameInterfaceJDBClientOptions
-    {
-        public Uri BaseUrl { get; set; } = default!;
-    }
+    public Uri BaseUrl { get; set; } = default!;
 }

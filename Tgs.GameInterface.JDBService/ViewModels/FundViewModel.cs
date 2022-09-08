@@ -9,9 +9,9 @@ public record FundViewModel
     [Required]
     public string Domain { get; init; } = default!;
     [Required]
-    public string PartnerKey { get; init; } = default!;
+    public string AesKey { get; init; } = default!;
     [Required]
-    public string PartnerIV { get; init; } = default!;
+    public string AesIV { get; init; } = default!;
     [Required]
     public string Agent { get; init; } = default!;
     [Required]

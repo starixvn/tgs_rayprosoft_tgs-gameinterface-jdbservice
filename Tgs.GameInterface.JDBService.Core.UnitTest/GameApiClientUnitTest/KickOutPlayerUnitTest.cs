@@ -16,8 +16,8 @@ public class KickOutPlayerUnitTest
     {
         var apiUrl = new Uri("http://api.jygrq.com");
         var domain = "ZF";
-        var partnerKey = "831057181dd07807";
-        var partnerIV = "193a3159afebee65";
+        var aesKey = "831057181dd07807";
+        var aesIV = "193a3159afebee65";
         var agent = "zf055gpi";
         var playerCode = "4ucmqplxhfoe";
 
@@ -45,8 +45,8 @@ public class KickOutPlayerUnitTest
         var jsonString = JsonSerializer.Serialize(data);
         _ = fakeAesCryptography.GetAesEncryptAsync(
             Arg.Is(jsonString),
-            Arg.Is(partnerKey),
-            Arg.Is(partnerIV)).Returns(encryptedData);
+            Arg.Is(aesKey),
+            Arg.Is(aesIV)).Returns(encryptedData);
 
         var url = new Uri(apiUrl, "/apiRequest.do");
 
@@ -67,8 +67,8 @@ public class KickOutPlayerUnitTest
             .KickOutPlayerAsync(
                apiUrl,
                domain,
-               partnerKey,
-               partnerIV,
+               aesKey,
+               aesIV,
                agent,
                playerCode)
             .ConfigureAwait(false);

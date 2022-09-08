@@ -16,8 +16,8 @@ internal class PlayerCreateCommandService : ICommandService<PlayerCreateCommand>
             .CreatePlayerAsync(
                 command.ApiUrl,
                 command.Domain,
-                command.PartnerKey,
-                command.PartnerIV,
+                command.AesKey,
+                command.AesIV,
                 command.Agent,
                 command.PlayerCode,
                 cancellationToken);
