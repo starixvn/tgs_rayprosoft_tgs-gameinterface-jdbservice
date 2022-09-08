@@ -1,203 +1,278 @@
-﻿using Tgs.GameInterface.JDBService.Protos;
+﻿using System.Runtime.CompilerServices;
+using Google.Protobuf.WellKnownTypes;
+using Tgs.GameInterface.JDBService.Protos;
 
-namespace Tgs.GameInterface.JDBService.Client
+namespace Tgs.GameInterface.JDBService.Client;
+
+internal class GameInterfaceJDBClient : IGameInterfaceJDBClient
 {
-    internal class GameInterfaceJDBClient : IGameInterfaceJDBClient
+    private readonly GameInterfaceJDBService.GameInterfaceJDBServiceClient _client;
+
+    public GameInterfaceJDBClient(GameInterfaceJDBService.GameInterfaceJDBServiceClient client)
     {
-        private readonly GameInterfaceJDBService.GameInterfaceJDBServiceClient _client;
+        _client = client ?? throw new ArgumentNullException(nameof(client));
+    }
 
-        public GameInterfaceJDBClient(GameInterfaceJDBService.GameInterfaceJDBServiceClient client)
+    public async ValueTask<FundReply> FundInAsync(
+        Uri apiUrl,
+        string domain,
+        string aesKey,
+        string aesIV,
+        string agent,
+        string playerCode,
+        string serialNo,
+        decimal amount,
+        CancellationToken cancellationToken = default)
+    {
+        var request = new FundRequest()
         {
-            _client = client ?? throw new ArgumentNullException(nameof(client));
+            ApiUrl = apiUrl.ToString(),
+            Domain = domain,
+            AesKey = aesKey,
+            AesIV = aesIV,
+            Agent = agent,
+            PlayerCode = playerCode,
+            SerialNo = serialNo,
+            Amount = amount
+        };
+        return await _client
+            .FundInAsync(
+                request: request,
+                cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+    }
+
+    public async ValueTask<FundReply> FundOutAsync(
+        Uri apiUrl,
+        string domain,
+        string aesKey,
+        string aesIV,
+        string agent,
+        string playerCode,
+        string serialNo,
+        decimal amount,
+        CancellationToken cancellationToken = default)
+    {
+        var request = new FundRequest()
+        {
+            ApiUrl = apiUrl.ToString(),
+            Domain = domain,
+            AesKey = aesKey,
+            AesIV = aesIV,
+            Agent = agent,
+            PlayerCode = playerCode,
+            SerialNo = serialNo,
+            Amount = amount
+        };
+        return await _client
+            .FundOutAsync(
+                request: request,
+                cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+    }
+
+    public async ValueTask<bool> FundStatusAsync(
+        Uri apiUrl,
+        string domain,
+        string aesKey,
+        string aesIV,
+        string agent,
+        string serialNo,
+        CancellationToken cancellationToken = default)
+    {
+        var request = new FundStatusRequest()
+        {
+            ApiUrl = apiUrl.ToString(),
+            Domain = domain,
+            AesKey = aesKey,
+            AesIV = aesIV,
+            Agent = agent,
+            SerialNo = serialNo
+        };
+        var reply = await _client
+            .FundStatusAsync(
+                request: request,
+                cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+
+        return reply.IsOrderExist;
+    }
+
+    public async IAsyncEnumerable<GameHistoryInfo> GameHistoryAsync(
+        Uri apiUrl,
+        string domain,
+        string aesKey,
+        string aesIV,
+        string agent,
+        DateTime startTime,
+        DateTime endTime,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        var request = new GameHistoryRequest()
+        {
+            ApiUrl = apiUrl.ToString(),
+            Domain = domain,
+            AesKey = aesKey,
+            AesIV = aesIV,
+            Agent = agent,
+            StartTime = startTime.ToTimestamp(),
+            EndTime = endTime.ToTimestamp()
+        };
+        var reply = await _client
+            .GameHistoryAsync(
+                request: request,
+                cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+
+        if (!reply.Items.Any())
+        {
+            yield break;
         }
 
-        public async ValueTask<FundReply> FundInAsync(
-            Uri apiUrl,
-            string domain,
-            string partnerKey,
-            string partnerIV,
-            string agent,
-            string playerCode,
-            string serialNo,
-            decimal amount,
-            CancellationToken cancellationToken = default)
+        foreach (var item in reply.Items)
         {
-            var request = new FundRequest()
-            {
-                ApiUrl = apiUrl.ToString(),
-                Domain = domain,
-                PartnerKey = partnerKey,
-                PartnerIv = partnerIV,
-                Agent = agent,
-                PlayerCode = playerCode,
-                SerialNo = serialNo,
-                Amount = amount
-            };
-            return await _client
-                .FundInAsync(
-                    request: request,
-                    cancellationToken: cancellationToken)
-                .ConfigureAwait(false);
+            yield return item;
+        }
+    }
+
+    public async IAsyncEnumerable<GameHistoryInfo> GameOldHistoryAsync(
+        Uri apiUrl,
+        string domain,
+        string aesKey,
+        string aesIV,
+        string agent,
+        DateTime startTime,
+        DateTime endTime,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        var request = new GameHistoryRequest()
+        {
+            ApiUrl = apiUrl.ToString(),
+            Domain = domain,
+            AesKey = aesKey,
+            AesIV = aesIV,
+            Agent = agent,
+            StartTime = startTime.ToTimestamp(),
+            EndTime = endTime.ToTimestamp()
+        };
+        var reply = await _client
+            .GameOldHistoryAsync(
+                request: request,
+                cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+
+        if (!reply.Items.Any())
+        {
+            yield break;
         }
 
-        public async ValueTask<FundReply> FundOutAsync(
-            Uri apiUrl,
-            string domain,
-            string partnerKey,
-            string partnerIV,
-            string agent,
-            string playerCode,
-            string serialNo,
-            decimal amount,
-            CancellationToken cancellationToken = default)
+        foreach (var item in reply.Items)
         {
-            var request = new FundRequest()
-            {
-                ApiUrl = apiUrl.ToString(),
-                Domain = domain,
-                PartnerKey = partnerKey,
-                PartnerIv = partnerIV,
-                Agent = agent,
-                PlayerCode = playerCode,
-                SerialNo = serialNo,
-                Amount = amount
-            };
-            return await _client
-                .FundOutAsync(
-                    request: request,
-                    cancellationToken: cancellationToken)
-                .ConfigureAwait(false);
+            yield return item;
         }
+    }
 
-        public async ValueTask<bool> FundStatusAsync(
-            Uri apiUrl,
-            string domain,
-            string partnerKey,
-            string partnerIV,
-            string agent,
-            string serialNo,
-            CancellationToken cancellationToken = default)
+    public async ValueTask<GameUrlReply> GameUrlAsync(
+        Uri apiUrl,
+        string domain,
+        string aesKey,
+        string aesIV,
+        string playerCode,
+        string gameType,
+        string machineType,
+        string lang,
+        CancellationToken cancellationToken = default)
+    {
+        var request = new GameUrlRequest()
         {
-            var request = new FundStatusRequest()
-            {
-                ApiUrl = apiUrl.ToString(),
-                Domain = domain,
-                PartnerKey = partnerKey,
-                PartnerIv = partnerIV,
-                Agent = agent,
-                SerialNo = serialNo
-            };
-            var reply = await _client
-                .FundStatusAsync(
-                    request: request,
-                    cancellationToken: cancellationToken)
-                .ConfigureAwait(false);
+            ApiUrl = apiUrl.ToString(),
+            Domain = domain,
+            AesKey = aesKey,
+            AesIV = aesIV,
+            PlayerCode = playerCode,
+            GameType = gameType,
+            MachineType = machineType,
+            Lang = lang
+        };
+        return await _client
+            .GameUrlAsync(
+                request: request,
+                cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+    }
 
-            return reply.IsOrderExist;
-        }
-
-        public async ValueTask<GameUrlReply> GameUrlAsync(
-            Uri apiUrl,
-            string domain,
-            string partnerKey,
-            string partnerIV,
-            string playerCode,
-            string gameType,
-            string machineType,
-            string lang,
-            CancellationToken cancellationToken = default)
+    public async ValueTask<PlayerBalanceReply> PlayerBalanceAsync(
+        Uri apiUrl,
+        string domain,
+        string aesKey,
+        string aesIV,
+        string agent,
+        string playerCode,
+        CancellationToken cancellationToken = default)
+    {
+        var request = new PlayerBalanceRequest()
         {
-            var request = new GameUrlRequest()
-            {
-                ApiUrl = apiUrl.ToString(),
-                Domain = domain,
-                PartnerKey = partnerKey,
-                PartnerIv = partnerIV,
-                PlayerCode = playerCode,
-                GameType = gameType,
-                MachineType = machineType,
-                Lang = lang
-            };
-            return await _client
-                .GameUrlAsync(
-                    request: request,
-                    cancellationToken: cancellationToken)
-                .ConfigureAwait(false);
-        }
+            ApiUrl = apiUrl.ToString(),
+            Domain = domain,
+            AesKey = aesKey,
+            AesIV = aesIV,
+            Agent = agent,
+            PlayerCode = playerCode
+        };
+        return await _client
+            .PlayerBalanceAsync(
+                request: request,
+                cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+    }
 
-        public async ValueTask<PlayerBalanceReply> PlayerBalanceAsync(
-            Uri apiUrl,
-            string domain,
-            string partnerKey,
-            string partnerIV,
-            string agent,
-            string playerCode,
-            CancellationToken cancellationToken = default)
+    public async ValueTask PlayerCreateAsync(
+        Uri apiUrl,
+        string domain,
+        string aesKey,
+        string aesIV,
+        string agent,
+        string playerCode,
+        CancellationToken cancellationToken = default)
+    {
+        var request = new PlayerCreateRequest()
         {
-            var request = new PlayerBalanceRequest()
-            {
-                ApiUrl = apiUrl.ToString(),
-                Domain = domain,
-                PartnerKey = partnerKey,
-                PartnerIv = partnerIV,
-                Agent = agent,
-                PlayerCode = playerCode
-            };
-            return await _client
-                .PlayerBalanceAsync(
-                    request: request,
-                    cancellationToken: cancellationToken)
-                .ConfigureAwait(false);
-        }
+            ApiUrl = apiUrl.ToString(),
+            Domain = domain,
+            AesKey = aesKey,
+            AesIV = aesIV,
+            Agent = agent,
+            PlayerCode = playerCode
+        };
+        _ = await _client
+            .PlayerCreateAsync(
+                request: request,
+                cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+    }
 
-        public async ValueTask PlayerCreateAsync(
-            Uri apiUrl,
-            string domain,
-            string partnerKey,
-            string partnerIV,
-            string agent,
-            string playerCode,
-            CancellationToken cancellationToken = default)
+    public async ValueTask PlayerKickAsync(
+        Uri apiUrl,
+        string domain,
+        string aesKey,
+        string aesIV,
+        string agent,
+        string playerCode,
+        CancellationToken cancellationToken = default)
+    {
+        var request = new PlayerKickRequest()
         {
-            var request = new PlayerCreateRequest()
-            {
-                ApiUrl = apiUrl.ToString(),
-                Domain = domain,
-                PartnerKey = partnerKey,
-                PartnerIv = partnerIV,
-                Agent = agent,
-                PlayerCode = playerCode
-            };
-            _ = await _client
-                .PlayerCreateAsync(
-                    request: request,
-                    cancellationToken: cancellationToken)
-                .ConfigureAwait(false);
-        }
-
-        public async ValueTask PlayerKickAsync(
-            Uri apiUrl,
-            string domain,
-            string partnerKey,
-            string partnerIV,
-            string agent,
-            string playerCode,
-            CancellationToken cancellationToken = default)
-        {
-            var request = new PlayerKickRequest()
-            {
-                ApiUrl = apiUrl.ToString(),
-                Domain = domain,
-                PartnerKey = partnerKey,
-                PartnerIv = partnerIV,
-                Agent = agent,
-                PlayerCode = playerCode
-            };
-            _ = await _client
-                .PlayerKickAsync(
-                    request: request,
-                    cancellationToken: cancellationToken)
-                .ConfigureAwait(false);
-        }
+            ApiUrl = apiUrl.ToString(),
+            Domain = domain,
+            AesKey = aesKey,
+            AesIV = aesIV,
+            Agent = agent,
+            PlayerCode = playerCode
+        };
+        _ = await _client
+            .PlayerKickAsync(
+                request: request,
+                cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
     }
 }

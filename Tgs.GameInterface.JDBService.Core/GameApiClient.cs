@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Microsoft.Extensions.Internal;
@@ -17,6 +18,7 @@ internal class GameApiClient : IGameApiClient
     private readonly HttpClient _httpClient;
     private readonly ISystemClock _systemClock;
     private readonly IAesCryptography _aesCryptography;
+    private readonly TimeZoneInfo _timeZone;
 
     public GameApiClient(
         IOptions<GameInterfaceSettingOptions> options,
@@ -30,13 +32,14 @@ internal class GameApiClient : IGameApiClient
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         _systemClock = systemClock ?? throw new ArgumentNullException(nameof(systemClock));
         _aesCryptography = aesCryptography ?? throw new ArgumentNullException(nameof(aesCryptography));
+        _timeZone = TimeZoneInfo.CreateCustomTimeZone(id: "eastern time", baseUtcOffset: TimeSpan.FromHours(-4), "eastern time", "eastern time");
     }
 
     public async ValueTask<bool> CheckCashTransferAsync(
         Uri apiUrl,
         string domain,
-        string partnerKey,
-        string partnerIV,
+        string aesKey,
+        string aesIV,
         string agent,
         string serialNo,
         CancellationToken cancellationToken = default)
@@ -52,8 +55,8 @@ internal class GameApiClient : IGameApiClient
         var encryptedData = await _aesCryptography
                 .GetAesEncryptAsync(
                     jsonString,
-                    partnerKey,
-                    partnerIV,
+                    aesKey,
+                    aesIV,
                     cancellationToken)
                 .ConfigureAwait(false);
 
@@ -76,8 +79,8 @@ internal class GameApiClient : IGameApiClient
     public async ValueTask CreatePlayerAsync(
         Uri apiUrl,
         string domain,
-        string partnerKey,
-        string partnerIV,
+        string aesKey,
+        string aesIV,
         string agent,
         string playerCode,
         CancellationToken cancellationToken = default)
@@ -95,8 +98,8 @@ internal class GameApiClient : IGameApiClient
         var encryptedData = await _aesCryptography
                 .GetAesEncryptAsync(
                     jsonString,
-                    partnerKey,
-                    partnerIV,
+                    aesKey,
+                    aesIV,
                     cancellationToken)
                 .ConfigureAwait(false);
 
@@ -119,8 +122,8 @@ internal class GameApiClient : IGameApiClient
     public async ValueTask<TransactionResult> DepositAsync(
         Uri apiUrl,
         string domain,
-        string partnerKey,
-        string partnerIV,
+        string aesKey,
+        string aesIV,
         string agent,
         string playerCode,
         string serialNo,
@@ -141,8 +144,8 @@ internal class GameApiClient : IGameApiClient
         var encryptedData = await _aesCryptography
                 .GetAesEncryptAsync(
                     jsonString,
-                    partnerKey,
-                    partnerIV,
+                    aesKey,
+                    aesIV,
                     cancellationToken)
                 .ConfigureAwait(false);
 
@@ -156,7 +159,6 @@ internal class GameApiClient : IGameApiClient
 
         var status = jsonNode["status"]!.ToString();
         var errText = jsonNode["err_text"]?.ToString();
-        var cuiabaTime = TimeZoneInfo.FindSystemTimeZoneById("Central Brazilian Standard Time");//(UTC-04:00) Cuiaba
 
         return status.Equals("6009", StringComparison.OrdinalIgnoreCase)
             ? throw new Status_6009_Exception(amount)
@@ -167,28 +169,155 @@ internal class GameApiClient : IGameApiClient
             : new TransactionResult(
             Pid: long.Parse(jsonNode["pid"]!.ToString()),
             SerialNo: jsonNode["serialNo"]!.ToString(),
-            PayDate: new DateTimeOffset(DateTime.Parse(jsonNode["payDate"]!.ToString()), cuiabaTime.GetUtcOffset(DateTime.Parse(jsonNode["payDate"]!.ToString()))),
+            PayDate: new DateTimeOffset(DateTime.Parse(jsonNode["payDate"]!.ToString()), _timeZone.GetUtcOffset(DateTime.Parse(jsonNode["payDate"]!.ToString()))),
             Amount: decimal.Parse(jsonNode["amount"]!.ToString()),
             UserBalance: decimal.Parse(jsonNode["userBalance"]!.ToString()),
             AgentCashBalance: decimal.Parse(jsonNode["agentCashBalance"]!.ToString()));
     }
 
-    public ValueTask GetHistoryAsync(
+    public async IAsyncEnumerable<GameHistoryResult> SearchGameTransactionDetailsAsync(
         Uri apiUrl,
         string domain,
-        string partnerKey,
-        string partnerIV,
+        string aesKey,
+        string aesIV,
         string agent,
-        DateTimeOffset starttime,
-        DateTimeOffset endtime,
-        CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+        DateTime startTime,
+        DateTime endTime,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        var startTimeEastern = TimeZoneInfo.ConvertTime(startTime.ToUniversalTime(), _timeZone);
+        var endTimeEastern = TimeZoneInfo.ConvertTime(endTime.ToUniversalTime(), _timeZone);
+
+        var data = new
+        {
+            action = 29,
+            ts = _systemClock.UtcNow.ToUnixTimeMilliseconds(),
+            parent = agent,
+            starttime = startTimeEastern.ToString("dd-MM-yyyy HH:mm:00"),
+            endtime = endTimeEastern.ToString("dd-MM-yyyy HH:mm:00")
+        };
+        var jsonString = JsonSerializer.Serialize(data);
+        var encryptedData = await _aesCryptography
+                .GetAesEncryptAsync(
+                    jsonString,
+                    aesKey,
+                    aesIV,
+                    cancellationToken)
+                .ConfigureAwait(false);
+
+        var jsonNode = await PostAsync(
+                apiUrl,
+                domain,
+                encryptedData,
+                "SearchGameTransactionDetails",
+                cancellationToken)
+            .ConfigureAwait(false);
+
+        var status = jsonNode["status"]!.ToString();
+        var errText = jsonNode["err_text"]?.ToString();
+        if (status is not "0000" and not "8006")
+        {
+            throw new GameProvisioningErrorException(status, errText ?? string.Empty);
+        }
+
+        var gameTransactionDetails = jsonNode["data"].Deserialize<IEnumerable<GameTransactionDetail>>();
+
+        if (gameTransactionDetails == null || !gameTransactionDetails.Any())
+        {
+            yield break;
+        }
+
+        foreach (var gameTransactionDetail in gameTransactionDetails)
+        {
+            yield return new GameHistoryResult(
+                PlayerCode: gameTransactionDetail.PlayerId,
+                ExternalRoundId: gameTransactionDetail.SeqNo.ToString(),
+                ExternalGameId: $"{gameTransactionDetail.GameType}_{gameTransactionDetail.MachineType}",
+                ExternalCreatedOn: new DateTimeOffset(DateTime.Parse(gameTransactionDetail.GameDate), _timeZone.GetUtcOffset(DateTime.Parse(gameTransactionDetail.GameDate))),
+                ExternalClosedOn: new DateTimeOffset(DateTime.Parse(gameTransactionDetail.LastModifyTime), _timeZone.GetUtcOffset(DateTime.Parse(gameTransactionDetail.LastModifyTime))),
+                Bet: (gameTransactionDetail.HasGamble == 0) ? -gameTransactionDetail.Bet : -gameTransactionDetail.GambleBet,
+                ValidBet: (gameTransactionDetail.HasGamble == 0) ? -gameTransactionDetail.Bet : -gameTransactionDetail.GambleBet,
+                PlayerWinLoss: gameTransactionDetail.Win,
+                Turnover: (gameTransactionDetail.HasGamble == 0) ? -gameTransactionDetail.Bet : -gameTransactionDetail.GambleBet,
+                Settle: gameTransactionDetail.Total,
+                AdditionalData: JsonSerializer.Serialize(gameTransactionDetail));
+        }
+    }
+
+    public async IAsyncEnumerable<GameHistoryResult> SearchGameOldTransactionDetailsAsync(
+        Uri apiUrl,
+        string domain,
+        string aesKey,
+        string aesIV,
+        string agent,
+        DateTime startTime,
+        DateTime endTime,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        var startTimeEastern = TimeZoneInfo.ConvertTime(startTime.ToUniversalTime(), _timeZone);
+        var endTimeEastern = TimeZoneInfo.ConvertTime(endTime.ToUniversalTime(), _timeZone);
+
+        var data = new
+        {
+            action = 64,
+            ts = _systemClock.UtcNow.ToUnixTimeMilliseconds(),
+            parent = agent,
+            starttime = startTimeEastern.ToString("dd-MM-yyyy HH:mm:00"),
+            endtime = endTimeEastern.ToString("dd-MM-yyyy HH:mm:00")
+        };
+        var jsonString = JsonSerializer.Serialize(data);
+        var encryptedData = await _aesCryptography
+                .GetAesEncryptAsync(
+                    jsonString,
+                    aesKey,
+                    aesIV,
+                    cancellationToken)
+                .ConfigureAwait(false);
+
+        var jsonNode = await PostAsync(
+                apiUrl,
+                domain,
+                encryptedData,
+                "SearchGameOldTransactionDetails",
+                cancellationToken)
+            .ConfigureAwait(false);
+
+        var status = jsonNode["status"]!.ToString();
+        var errText = jsonNode["err_text"]?.ToString();
+        if (status is not "0000" and not "8006")
+        {
+            throw new GameProvisioningErrorException(status, errText ?? string.Empty);
+        }
+
+        var gameTransactionDetails = jsonNode["data"].Deserialize<IEnumerable<GameTransactionDetail>>();
+
+        if (gameTransactionDetails == null || !gameTransactionDetails.Any())
+        {
+            yield break;
+        }
+
+        foreach (var gameTransactionDetail in gameTransactionDetails)
+        {
+            yield return new GameHistoryResult(
+                PlayerCode: gameTransactionDetail.PlayerId,
+                ExternalRoundId: gameTransactionDetail.SeqNo.ToString(),
+                ExternalGameId: $"{gameTransactionDetail.GameType}_{gameTransactionDetail.MachineType}",
+                ExternalCreatedOn: new DateTimeOffset(DateTime.Parse(gameTransactionDetail.GameDate), _timeZone.GetUtcOffset(DateTime.Parse(gameTransactionDetail.GameDate))),
+                ExternalClosedOn: new DateTimeOffset(DateTime.Parse(gameTransactionDetail.LastModifyTime), _timeZone.GetUtcOffset(DateTime.Parse(gameTransactionDetail.LastModifyTime))),
+                Bet: (gameTransactionDetail.HasGamble == 0) ? -gameTransactionDetail.Bet : -gameTransactionDetail.GambleBet,
+                ValidBet: (gameTransactionDetail.HasGamble == 0) ? -gameTransactionDetail.Bet : -gameTransactionDetail.GambleBet,
+                PlayerWinLoss: gameTransactionDetail.Win,
+                Turnover: (gameTransactionDetail.HasGamble == 0) ? -gameTransactionDetail.Bet : -gameTransactionDetail.GambleBet,
+                Settle: gameTransactionDetail.Total,
+                AdditionalData: JsonSerializer.Serialize(gameTransactionDetail));
+        }
+    }
 
     public async ValueTask<(bool IsPlayerExist, decimal Balance)> SearchPlayerInformationAsync(
         Uri apiUrl,
         string domain,
-        string partnerKey,
-        string partnerIV,
+        string aesKey,
+        string aesIV,
         string agent,
         string playerCode,
         CancellationToken cancellationToken = default)
@@ -204,8 +333,8 @@ internal class GameApiClient : IGameApiClient
         var encryptedData = await _aesCryptography
                 .GetAesEncryptAsync(
                     jsonString,
-                    partnerKey,
-                    partnerIV,
+                    aesKey,
+                    aesIV,
                     cancellationToken)
                 .ConfigureAwait(false);
 
@@ -229,8 +358,8 @@ internal class GameApiClient : IGameApiClient
     public async ValueTask<(bool IsPlayerExist, string GameUrl)> GetTokenAsync(
         Uri apiUrl,
         string domain,
-        string partnerKey,
-        string partnerIV,
+        string aesKey,
+        string aesIV,
         string playerCode,
         string gameType,
         string machineType,
@@ -254,8 +383,8 @@ internal class GameApiClient : IGameApiClient
         var encryptedData = await _aesCryptography
                 .GetAesEncryptAsync(
                     jsonString,
-                    partnerKey,
-                    partnerIV,
+                    aesKey,
+                    aesIV,
                     cancellationToken)
                 .ConfigureAwait(false);
 
@@ -279,8 +408,8 @@ internal class GameApiClient : IGameApiClient
     public async ValueTask KickOutPlayerAsync(
         Uri apiUrl,
         string domain,
-        string partnerKey,
-        string partnerIV,
+        string aesKey,
+        string aesIV,
         string agent,
         string playerCode,
         CancellationToken cancellationToken = default)
@@ -297,8 +426,8 @@ internal class GameApiClient : IGameApiClient
         var encryptedData = await _aesCryptography
                 .GetAesEncryptAsync(
                     jsonString,
-                    partnerKey,
-                    partnerIV,
+                    aesKey,
+                    aesIV,
                     cancellationToken)
                 .ConfigureAwait(false);
 
@@ -321,8 +450,8 @@ internal class GameApiClient : IGameApiClient
     public async ValueTask<TransactionResult> WithdrawalAsync(
         Uri apiUrl,
         string domain,
-        string partnerKey,
-        string partnerIV,
+        string aesKey,
+        string aesIV,
         string agent,
         string playerCode,
         string serialNo,
@@ -352,8 +481,8 @@ internal class GameApiClient : IGameApiClient
             var encryptedData = await _aesCryptography
                     .GetAesEncryptAsync(
                         jsonString,
-                        partnerKey,
-                        partnerIV,
+                        aesKey,
+                        aesIV,
                         cancellationToken)
                     .ConfigureAwait(false);
 
@@ -368,7 +497,6 @@ internal class GameApiClient : IGameApiClient
 
         var status = jsonNode["status"]!.ToString();
         var errText = jsonNode["err_text"]?.ToString();
-        var cuiabaTime = TimeZoneInfo.FindSystemTimeZoneById("Central Brazilian Standard Time");//(UTC-04:00) Cuiaba
 
         return status.Equals("6009", StringComparison.OrdinalIgnoreCase)
             ? throw new Status_6009_Exception(amount)
@@ -379,14 +507,14 @@ internal class GameApiClient : IGameApiClient
             : new TransactionResult(
             Pid: long.Parse(jsonNode["pid"]!.ToString()),
             SerialNo: jsonNode["serialNo"]!.ToString(),
-            PayDate: new DateTimeOffset(DateTime.Parse(jsonNode["payDate"]!.ToString()), cuiabaTime.GetUtcOffset(DateTime.Parse(jsonNode["payDate"]!.ToString()))),
+            PayDate: new DateTimeOffset(DateTime.Parse(jsonNode["payDate"]!.ToString()), _timeZone.GetUtcOffset(DateTime.Parse(jsonNode["payDate"]!.ToString()))),
             Amount: decimal.Parse(jsonNode["amount"]!.ToString()),
             UserBalance: decimal.Parse(jsonNode["userBalance"]!.ToString()),
             AgentCashBalance: decimal.Parse(jsonNode["agentCashBalance"]!.ToString()));
     }
 
     private async ValueTask<JsonNode> PostAsync(
-        Uri apiUrl,
+            Uri apiUrl,
         string domain,
         string encryptedData,
         string action,

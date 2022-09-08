@@ -17,14 +17,16 @@ service GameInterfaceJDBService {
   rpc FundIn (FundRequest) returns (FundReply);
   rpc FundStatus(FundStatusRequest) returns (FundStatusReply);
   rpc GameUrl (GameUrlRequest) returns (GameUrlReply);
+  rpc GameHistory (GameHistoryRequest) returns (GameHistoryReply);
+  rpc GameOldHistory (GameHistoryRequest) returns (GameHistoryReply);
 }
 
 // The request message containing the user's name.
 message PlayerBalanceRequest {
 	string api_url = 1;
 	string domain = 2;
-	string partner_key = 3;
-	string partner_iv = 4;
+	string aes_key = 3;
+	string aes_i_v = 4;
 	string agent = 5;
 	string player_code= 6;
 }
@@ -32,8 +34,8 @@ message PlayerBalanceRequest {
 message PlayerCreateRequest {
 	string api_url = 1;
 	string domain = 2;
-	string partner_key = 3;
-	string partner_iv = 4;
+	string aes_key = 3;
+	string aes_i_v = 4;
 	string agent = 5;
 	string player_code= 6;
 }
@@ -41,8 +43,8 @@ message PlayerCreateRequest {
 message PlayerKickRequest {
 	string api_url = 1;
 	string domain = 2;
-	string partner_key = 3;
-	string partner_iv = 4;
+	string aes_key = 3;
+	string aes_i_v = 4;
 	string agent = 5;
 	string player_code= 6;
 }
@@ -50,8 +52,8 @@ message PlayerKickRequest {
 message FundRequest {
 	string api_url = 1;
 	string domain = 2;
-	string partner_key = 3;
-	string partner_iv = 4;
+	string aes_key = 3;
+	string aes_i_v = 4;
 	string agent = 5;
 	string player_code= 6;
 	string serial_no = 7;
@@ -61,8 +63,8 @@ message FundRequest {
 message FundStatusRequest {
 	string api_url = 1;
 	string domain = 2;
-	string partner_key = 3;
-	string partner_iv = 4;
+	string aes_key = 3;
+	string aes_i_v = 4;
 	string agent = 5;
 	string serial_no = 6;
 }
@@ -70,12 +72,22 @@ message FundStatusRequest {
 message GameUrlRequest {
 	string api_url = 1;
 	string domain = 2;
-	string partner_key = 3;
-	string partner_iv = 4;
+	string aes_key = 3;
+	string aes_i_v = 4;
 	string player_code = 5;
 	string game_type = 6;
 	string machine_type = 7;
 	string lang = 8;
+}
+
+message GameHistoryRequest {
+	string api_url = 1;
+	string domain = 2;
+	string aes_key = 3;
+	string aes_i_v = 4;
+	string agent = 5;
+	google.protobuf.Timestamp start_time = 6; 
+	google.protobuf.Timestamp end_time = 7;
 }
 
 // The response message containing the greetings.
@@ -104,4 +116,22 @@ message FundStatusReply {
 message GameUrlReply {
 	bool is_player_exist = 1;
 	string game_url = 2;
+}
+
+message GameHistoryReply {
+	repeated GameHistoryInfo items = 1;
+}
+
+message GameHistoryInfo {
+	string player_code = 1;
+	string external_round_id = 2;
+    string external_game_id = 3;
+	google.protobuf.Timestamp external_created_on = 4;
+	google.protobuf.Timestamp external_closed_on = 5;
+	phoenix.protobuf.DecimalValue bet = 8;
+	phoenix.protobuf.DecimalValue valid_bet = 9;
+	phoenix.protobuf.DecimalValue player_win_loss = 10;
+	phoenix.protobuf.DecimalValue turnover = 11;
+	phoenix.protobuf.DecimalValue settle = 12;
+	string additional_data = 13;
 }

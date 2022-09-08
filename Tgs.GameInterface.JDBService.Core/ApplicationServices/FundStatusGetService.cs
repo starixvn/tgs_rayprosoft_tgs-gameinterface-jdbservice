@@ -18,8 +18,8 @@ internal class FundStatusGetService : IGetService<FundStatusQuery, bool>
         .CheckCashTransferAsync(
             query.ApiUrl,
             query.Domain,
-            query.PartnerKey,
-            query.PartnerIV,
+            query.AesKey,
+            query.AesIV,
             query.Agent,
             query.SerialNo,
             cancellationToken);

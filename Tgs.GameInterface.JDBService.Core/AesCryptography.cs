@@ -26,8 +26,6 @@ public class AesCryptography : IAesCryptography
         await cryptoStream
                 .WriteAsync(
                     buffer: dataBytes,
-                    offset: 0,
-                    count: dataBytes.Length,
                     cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
         await cryptoStream

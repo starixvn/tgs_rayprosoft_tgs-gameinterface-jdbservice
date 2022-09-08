@@ -19,8 +19,8 @@ internal class FundOutGetService : IGetService<FundOutQuery, FundResult>
                 .DepositAsync(
                     query.ApiUrl,
                     query.Domain,
-                    query.PartnerKey,
-                    query.PartnerIV,
+                    query.AesKey,
+                    query.AesIV,
                     query.Agent,
                     query.PlayerCode,
                     query.SerialNo,

@@ -17,8 +17,8 @@ public class CheckCashTransferUnitTest
     {
         var apiUrl = new Uri("http://api.jygrq.com");
         var domain = "ZF";
-        var partnerKey = "831057181dd07807";
-        var partnerIV = "193a3159afebee65";
+        var aesKey = "831057181dd07807";
+        var aesIV = "193a3159afebee65";
         var agent = "zf055gpi";
         var serialNo = "1662442853";
 
@@ -46,8 +46,8 @@ public class CheckCashTransferUnitTest
         var jsonString = JsonSerializer.Serialize(data);
         _ = fakeAesCryptography.GetAesEncryptAsync(
             Arg.Is(jsonString),
-            Arg.Is(partnerKey),
-            Arg.Is(partnerIV)).Returns(encryptedData);
+            Arg.Is(aesKey),
+            Arg.Is(aesIV)).Returns(encryptedData);
 
         var url = new Uri(apiUrl, "/apiRequest.do");
 
@@ -68,8 +68,8 @@ public class CheckCashTransferUnitTest
              .CheckCashTransferAsync(
                 apiUrl,
                 domain,
-                partnerKey,
-                partnerIV,
+                aesKey,
+                aesIV,
                 agent,
                 serialNo)
              .ConfigureAwait(false);
@@ -83,8 +83,8 @@ public class CheckCashTransferUnitTest
     {
         var apiUrl = new Uri("http://api.jygrq.com");
         var domain = "ZF";
-        var partnerKey = "831057181dd07807";
-        var partnerIV = "193a3159afebee65";
+        var aesKey = "831057181dd07807";
+        var aesIV = "193a3159afebee65";
         var agent = "zf055gpi";
         var serialNo = "1662442853";
 
@@ -112,8 +112,8 @@ public class CheckCashTransferUnitTest
         var jsonString = JsonSerializer.Serialize(data);
         _ = fakeAesCryptography.GetAesEncryptAsync(
             Arg.Is(jsonString),
-            Arg.Is(partnerKey),
-            Arg.Is(partnerIV)).Returns(encryptedData);
+            Arg.Is(aesKey),
+            Arg.Is(aesIV)).Returns(encryptedData);
 
         var url = new Uri(apiUrl, "/apiRequest.do");
 
@@ -134,8 +134,8 @@ public class CheckCashTransferUnitTest
               .CheckCashTransferAsync(
                  apiUrl,
                  domain,
-                 partnerKey,
-                 partnerIV,
+                 aesKey,
+                 aesIV,
                  agent,
                  serialNo)
               .ConfigureAwait(false));

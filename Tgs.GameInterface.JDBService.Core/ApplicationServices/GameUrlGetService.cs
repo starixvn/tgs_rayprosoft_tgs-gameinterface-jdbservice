@@ -19,8 +19,8 @@ internal class GameUrlGetService : IGetService<GameUrlQuery, GameUrlResult>
                 .GetTokenAsync(
                     query.ApiUrl,
                     query.Domain,
-                    query.PartnerKey,
-                    query.PartnerIV,
+                    query.AesKey,
+                    query.AesIV,
                     query.PlayerCode,
                     query.GameType,
                     query.MachineType,

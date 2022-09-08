@@ -19,8 +19,8 @@ internal class PlayerBalanceGetService : IGetService<PlayerBalanceQuery, PlayerB
                 .SearchPlayerInformationAsync(
                     query.ApiUrl,
                     query.Domain,
-                    query.PartnerKey,
-                    query.PartnerIV,
+                    query.AesKey,
+                    query.AesIV,
                     query.Agent,
                     query.PlayerCode,
                     cancellationToken)
