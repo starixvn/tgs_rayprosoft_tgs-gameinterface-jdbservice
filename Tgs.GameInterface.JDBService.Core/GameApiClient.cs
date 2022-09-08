@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Polly;
 using Tgs.GameInterface.JDBService.Core.Exceptions;
+using Tgs.GameInterface.JDBService.Core.JsonConverters;
 using Tgs.GameInterface.JDBService.Core.Models;
 
 namespace Tgs.GameInterface.JDBService.Core;
@@ -19,6 +20,7 @@ internal class GameApiClient : IGameApiClient
     private readonly ISystemClock _systemClock;
     private readonly IAesCryptography _aesCryptography;
     private readonly TimeZoneInfo _timeZone;
+    private readonly JsonSerializerOptions _jsonSerializerOptions;
 
     public GameApiClient(
         IOptions<GameInterfaceSettingOptions> options,
@@ -33,6 +35,15 @@ internal class GameApiClient : IGameApiClient
         _systemClock = systemClock ?? throw new ArgumentNullException(nameof(systemClock));
         _aesCryptography = aesCryptography ?? throw new ArgumentNullException(nameof(aesCryptography));
         _timeZone = TimeZoneInfo.CreateCustomTimeZone(id: "eastern time", baseUtcOffset: TimeSpan.FromHours(-4), "eastern time", "eastern time");
+        _jsonSerializerOptions = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowReadingFromString,
+            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault,
+            Converters = {
+                new JDBDateTimeConverter()
+            }
+        };
     }
 
     public async ValueTask<bool> CheckCashTransferAsync(
@@ -220,7 +231,7 @@ internal class GameApiClient : IGameApiClient
             throw new GameProvisioningErrorException(status, errText ?? string.Empty);
         }
 
-        var gameTransactionDetails = jsonNode["data"].Deserialize<IEnumerable<GameTransactionDetail>>();
+        var gameTransactionDetails = jsonNode["data"].Deserialize<IEnumerable<GameTransactionDetail>>(_jsonSerializerOptions);
 
         if (gameTransactionDetails == null || !gameTransactionDetails.Any())
         {
@@ -233,8 +244,8 @@ internal class GameApiClient : IGameApiClient
                 PlayerCode: gameTransactionDetail.PlayerId,
                 ExternalRoundId: gameTransactionDetail.SeqNo.ToString(),
                 ExternalGameId: $"{gameTransactionDetail.GameType}_{gameTransactionDetail.MachineType}",
-                ExternalCreatedOn: new DateTimeOffset(DateTime.Parse(gameTransactionDetail.GameDate), _timeZone.GetUtcOffset(DateTime.Parse(gameTransactionDetail.GameDate))),
-                ExternalClosedOn: new DateTimeOffset(DateTime.Parse(gameTransactionDetail.LastModifyTime), _timeZone.GetUtcOffset(DateTime.Parse(gameTransactionDetail.LastModifyTime))),
+                ExternalCreatedOn: gameTransactionDetail.GameDate,
+                ExternalClosedOn: gameTransactionDetail.LastModifyTime,
                 Bet: (gameTransactionDetail.HasGamble == 0) ? -gameTransactionDetail.Bet : -gameTransactionDetail.GambleBet,
                 ValidBet: (gameTransactionDetail.HasGamble == 0) ? -gameTransactionDetail.Bet : -gameTransactionDetail.GambleBet,
                 PlayerWinLoss: gameTransactionDetail.Win,
@@ -289,7 +300,7 @@ internal class GameApiClient : IGameApiClient
             throw new GameProvisioningErrorException(status, errText ?? string.Empty);
         }
 
-        var gameTransactionDetails = jsonNode["data"].Deserialize<IEnumerable<GameTransactionDetail>>();
+        var gameTransactionDetails = jsonNode["data"].Deserialize<IEnumerable<GameTransactionDetail>>(_jsonSerializerOptions);
 
         if (gameTransactionDetails == null || !gameTransactionDetails.Any())
         {
@@ -302,8 +313,8 @@ internal class GameApiClient : IGameApiClient
                 PlayerCode: gameTransactionDetail.PlayerId,
                 ExternalRoundId: gameTransactionDetail.SeqNo.ToString(),
                 ExternalGameId: $"{gameTransactionDetail.GameType}_{gameTransactionDetail.MachineType}",
-                ExternalCreatedOn: new DateTimeOffset(DateTime.Parse(gameTransactionDetail.GameDate), _timeZone.GetUtcOffset(DateTime.Parse(gameTransactionDetail.GameDate))),
-                ExternalClosedOn: new DateTimeOffset(DateTime.Parse(gameTransactionDetail.LastModifyTime), _timeZone.GetUtcOffset(DateTime.Parse(gameTransactionDetail.LastModifyTime))),
+                ExternalCreatedOn: gameTransactionDetail.GameDate,
+                ExternalClosedOn: gameTransactionDetail.LastModifyTime,
                 Bet: (gameTransactionDetail.HasGamble == 0) ? -gameTransactionDetail.Bet : -gameTransactionDetail.GambleBet,
                 ValidBet: (gameTransactionDetail.HasGamble == 0) ? -gameTransactionDetail.Bet : -gameTransactionDetail.GambleBet,
                 PlayerWinLoss: gameTransactionDetail.Win,

@@ -13,7 +13,7 @@ public record GameTransactionDetail
     [JsonPropertyName("mtype")]
     public int MachineType { get; set; }
     [JsonPropertyName("gameDate")]
-    public string GameDate { get; set; } = default!;
+    public DateTimeOffset GameDate { get; set; }
     [JsonPropertyName("bet")]
     public decimal Bet { get; set; }
     [JsonPropertyName("Win")]
@@ -29,7 +29,7 @@ public record GameTransactionDetail
     [JsonPropertyName("denom")]
     public decimal Denom { get; set; }
     [JsonPropertyName("lastModifyTime")]
-    public string LastModifyTime { get; set; } = default!;
+    public DateTimeOffset LastModifyTime { get; set; }
     [JsonPropertyName("playerIp")]
     public string PlayerIp { get; set; } = default!;
     [JsonPropertyName("clientType")]
