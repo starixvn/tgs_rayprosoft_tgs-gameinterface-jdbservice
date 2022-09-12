@@ -17,9 +17,9 @@ public record GameTransactionDetail
     [JsonPropertyName("bet")]
     public decimal Bet { get; set; }
     [JsonPropertyName("win")]
-    public decimal Win { get; set; }
+    public decimal Settle { get; set; }
     [JsonPropertyName("total")]
-    public decimal Total { get; set; }
+    public decimal PlayerWinLoss { get; set; }
     [JsonPropertyName("currency")]
     public string Currency { get; set; } = default!;
     [JsonPropertyName("jackpot")]

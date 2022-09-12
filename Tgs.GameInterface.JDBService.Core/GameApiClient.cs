@@ -248,9 +248,9 @@ internal class GameApiClient : IGameApiClient
                 ExternalClosedOn: gameTransactionDetail.LastModifyTime,
                 Bet: (gameTransactionDetail.HasGamble == 0) ? -gameTransactionDetail.Bet : -gameTransactionDetail.GambleBet,
                 ValidBet: (gameTransactionDetail.HasGamble == 0) ? -gameTransactionDetail.Bet : -gameTransactionDetail.GambleBet,
-                PlayerWinLoss: gameTransactionDetail.Win,
+                PlayerWinLoss: gameTransactionDetail.PlayerWinLoss,
                 Turnover: (gameTransactionDetail.HasGamble == 0) ? -gameTransactionDetail.Bet : -gameTransactionDetail.GambleBet,
-                Settle: gameTransactionDetail.Total,
+                Settle: gameTransactionDetail.Settle,
                 AdditionalData: JsonSerializer.Serialize(gameTransactionDetail));
         }
     }
@@ -317,9 +317,9 @@ internal class GameApiClient : IGameApiClient
                 ExternalClosedOn: gameTransactionDetail.LastModifyTime,
                 Bet: (gameTransactionDetail.HasGamble == 0) ? -gameTransactionDetail.Bet : -gameTransactionDetail.GambleBet,
                 ValidBet: (gameTransactionDetail.HasGamble == 0) ? -gameTransactionDetail.Bet : -gameTransactionDetail.GambleBet,
-                PlayerWinLoss: gameTransactionDetail.Win,
+                PlayerWinLoss: gameTransactionDetail.PlayerWinLoss,
                 Turnover: (gameTransactionDetail.HasGamble == 0) ? -gameTransactionDetail.Bet : -gameTransactionDetail.GambleBet,
-                Settle: gameTransactionDetail.Total,
+                Settle: gameTransactionDetail.Settle,
                 AdditionalData: JsonSerializer.Serialize(gameTransactionDetail));
         }
     }
