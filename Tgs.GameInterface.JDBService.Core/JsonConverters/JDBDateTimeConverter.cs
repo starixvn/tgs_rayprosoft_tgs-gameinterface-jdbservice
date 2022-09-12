@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Globalization;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Tgs.GameInterface.JDBService.Core.JsonConverters;
@@ -12,7 +13,7 @@ internal class JDBDateTimeConverter : JsonConverter<DateTimeOffset>
 
     public override DateTimeOffset Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        var unspecifyDate = DateTime.Parse(reader.GetString()!);
+        var unspecifyDate = DateTime.ParseExact(reader.GetString()!, "dd-MM-yyyy HH:mm:ss", CultureInfo.InvariantCulture);
 
         return new DateTimeOffset(unspecifyDate, _timeZone.GetUtcOffset(unspecifyDate));
     }
