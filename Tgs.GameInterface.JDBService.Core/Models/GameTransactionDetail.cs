@@ -16,7 +16,7 @@ public record GameTransactionDetail
     public DateTimeOffset GameDate { get; set; }
     [JsonPropertyName("bet")]
     public decimal Bet { get; set; }
-    [JsonPropertyName("Win")]
+    [JsonPropertyName("win")]
     public decimal Win { get; set; }
     [JsonPropertyName("total")]
     public decimal Total { get; set; }
