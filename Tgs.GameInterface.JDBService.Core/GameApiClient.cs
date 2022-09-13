@@ -130,7 +130,7 @@ internal class GameApiClient : IGameApiClient
         }
     }
 
-    public async ValueTask<TransactionResult> DepositAsync(
+    public async ValueTask<TransactionResponse> DepositAsync(
         Uri apiUrl,
         string domain,
         string aesKey,
@@ -177,13 +177,7 @@ internal class GameApiClient : IGameApiClient
             ? throw new Status_6010_Exception(amount)
             : !status.Equals("0000", StringComparison.OrdinalIgnoreCase)
             ? throw new GameProvisioningErrorException(status, errText ?? string.Empty)
-            : new TransactionResult(
-            Pid: long.Parse(jsonNode["pid"]!.ToString()),
-            SerialNo: jsonNode["serialNo"]!.ToString(),
-            PayDate: new DateTimeOffset(DateTime.Parse(jsonNode["payDate"]!.ToString()), _timeZone.GetUtcOffset(DateTime.Parse(jsonNode["payDate"]!.ToString()))),
-            Amount: decimal.Parse(jsonNode["amount"]!.ToString()),
-            UserBalance: decimal.Parse(jsonNode["userBalance"]!.ToString()),
-            AgentCashBalance: decimal.Parse(jsonNode["agentCashBalance"]!.ToString()));
+            : jsonNode.Deserialize<TransactionResponse>(_jsonSerializerOptions)!;
     }
 
     public async IAsyncEnumerable<GameHistoryResult> SearchGameTransactionDetailsAsync(
@@ -231,7 +225,7 @@ internal class GameApiClient : IGameApiClient
             throw new GameProvisioningErrorException(status, errText ?? string.Empty);
         }
 
-        var gameTransactionDetails = jsonNode["data"].Deserialize<IEnumerable<GameTransactionDetail>>(_jsonSerializerOptions);
+        var gameTransactionDetails = jsonNode["data"].Deserialize<IEnumerable<GameTransactionResponse>>(_jsonSerializerOptions);
 
         if (gameTransactionDetails == null || !gameTransactionDetails.Any())
         {
@@ -300,7 +294,7 @@ internal class GameApiClient : IGameApiClient
             throw new GameProvisioningErrorException(status, errText ?? string.Empty);
         }
 
-        var gameTransactionDetails = jsonNode["data"].Deserialize<IEnumerable<GameTransactionDetail>>(_jsonSerializerOptions);
+        var gameTransactionDetails = jsonNode["data"].Deserialize<IEnumerable<GameTransactionResponse>>(_jsonSerializerOptions);
 
         if (gameTransactionDetails == null || !gameTransactionDetails.Any())
         {
@@ -458,7 +452,7 @@ internal class GameApiClient : IGameApiClient
         }
     }
 
-    public async ValueTask<TransactionResult> WithdrawalAsync(
+    public async ValueTask<TransactionResponse> WithdrawalAsync(
         Uri apiUrl,
         string domain,
         string aesKey,
@@ -515,13 +509,7 @@ internal class GameApiClient : IGameApiClient
             ? throw new Status_6010_Exception(amount)
             : !status.Equals("0000", StringComparison.OrdinalIgnoreCase)
             ? throw new GameProvisioningErrorException(status, errText ?? string.Empty)
-            : new TransactionResult(
-            Pid: long.Parse(jsonNode["pid"]!.ToString()),
-            SerialNo: jsonNode["serialNo"]!.ToString(),
-            PayDate: new DateTimeOffset(DateTime.Parse(jsonNode["payDate"]!.ToString()), _timeZone.GetUtcOffset(DateTime.Parse(jsonNode["payDate"]!.ToString()))),
-            Amount: decimal.Parse(jsonNode["amount"]!.ToString()),
-            UserBalance: decimal.Parse(jsonNode["userBalance"]!.ToString()),
-            AgentCashBalance: decimal.Parse(jsonNode["agentCashBalance"]!.ToString()));
+            : jsonNode.Deserialize<TransactionResponse>(_jsonSerializerOptions)!;
     }
 
     private async ValueTask<JsonNode> PostAsync(

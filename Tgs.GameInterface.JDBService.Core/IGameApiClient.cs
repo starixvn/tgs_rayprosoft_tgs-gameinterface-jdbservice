@@ -22,7 +22,7 @@ public interface IGameApiClient
         string playerCode,
         CancellationToken cancellationToken = default);
 
-    ValueTask<TransactionResult> DepositAsync(
+    ValueTask<TransactionResponse> DepositAsync(
         Uri apiUrl,
         string domain,
         string aesKey,
@@ -82,7 +82,7 @@ public interface IGameApiClient
         string playerCode,
         CancellationToken cancellationToken = default);
 
-    ValueTask<TransactionResult> WithdrawalAsync(
+    ValueTask<TransactionResponse> WithdrawalAsync(
         Uri apiUrl,
         string domain,
         string aesKey,
