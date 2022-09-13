@@ -2,7 +2,7 @@
 
 namespace Tgs.GameInterface.JDBService.Core.Models;
 
-public record GameTransactionDetail
+public record GameTransactionResponse
 {
     [JsonPropertyName("seqNo")]
     public long SeqNo { get; set; }
