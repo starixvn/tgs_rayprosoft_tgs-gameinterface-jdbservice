@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configmap-{{ include "game-gameinterface-jdb-service.fullname" . }}
+  labels:
+    {{- include "game-gameinterface-jdb-service.labels" . | nindent 4 }}
+data:
+  appsettings.json: |
+    {
+        "Kestrel": {
+          "EndpointDefaults": {
+                "Protocols": "Http2"
+          },
+          "Endpoints": {
+            "HealthCheck": {
+                "Url": "http://*:{{ .Values.service.port }}",
+                "Protocols": "Http1"
+            },
+            "Grpc": {
+                "Url": "http://*:{{ .Values.servicegrpc.port }}"
+            }
+          }
+        },
+        "GameInterfaceSetting": {
+          "WithdrawalRetryCount": 1,
+           "WithdrawalIntervalSeconds": 30
+        }
+    }
+  monitor.settings.json: |
+    {
+      "Metrics": {
+        "MetricCount": "1"
+      },
+      "Logging":{
+        "Console": {
+          "FormatterName": "json"
+        },
+        "LogLevel": {
+          "Default": "Warning",
+          "Microsoft": "Warning",
+          "Microsoft.Diagnostics": "Warning",
+          "Microsoft.Hosting.Lifetime": "Information"
+        }
+      }
+    }

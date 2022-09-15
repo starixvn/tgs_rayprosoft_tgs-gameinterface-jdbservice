@@ -1,0 +1,50 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32804.467
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.GameInterface.JDBService", "Tgs.GameInterface.JDBService\Tgs.GameInterface.JDBService.csproj", "{55E4F429-200C-4723-8959-D85E07F1D845}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.GameInterface.JDBService.Core", "Tgs.GameInterface.JDBService.Core\Tgs.GameInterface.JDBService.Core.csproj", "{8BF749AB-D6C6-4C42-A898-7C88895F4779}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.GameInterface.JDBService.Core.UnitTest", "Tgs.GameInterface.JDBService.Core.UnitTest\Tgs.GameInterface.JDBService.Core.UnitTest.csproj", "{851A79C3-6CD4-4290-B60C-084B24269927}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.GameInterface.JDBService.Client", "Tgs.GameInterface.JDBService.Client\Tgs.GameInterface.JDBService.Client.csproj", "{F496FD2A-7AE8-45ED-A308-65EDB00DBF80}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "方案項目", "方案項目", "{10D9FC1D-6060-43AC-9616-B6B0A7B1E6CA}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		CodeMaid.config = CodeMaid.config
+		nuget.config = nuget.config
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{55E4F429-200C-4723-8959-D85E07F1D845}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55E4F429-200C-4723-8959-D85E07F1D845}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55E4F429-200C-4723-8959-D85E07F1D845}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55E4F429-200C-4723-8959-D85E07F1D845}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8BF749AB-D6C6-4C42-A898-7C88895F4779}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8BF749AB-D6C6-4C42-A898-7C88895F4779}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8BF749AB-D6C6-4C42-A898-7C88895F4779}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8BF749AB-D6C6-4C42-A898-7C88895F4779}.Release|Any CPU.Build.0 = Release|Any CPU
+		{851A79C3-6CD4-4290-B60C-084B24269927}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{851A79C3-6CD4-4290-B60C-084B24269927}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{851A79C3-6CD4-4290-B60C-084B24269927}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{851A79C3-6CD4-4290-B60C-084B24269927}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F496FD2A-7AE8-45ED-A308-65EDB00DBF80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F496FD2A-7AE8-45ED-A308-65EDB00DBF80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F496FD2A-7AE8-45ED-A308-65EDB00DBF80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F496FD2A-7AE8-45ED-A308-65EDB00DBF80}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8E1B6844-4114-453E-B106-8D76991C57C2}
+	EndGlobalSection
+EndGlobal
