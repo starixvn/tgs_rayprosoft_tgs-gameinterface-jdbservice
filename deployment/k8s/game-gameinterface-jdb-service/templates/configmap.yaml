@@ -7,24 +7,31 @@ metadata:
 data:
   appsettings.json: |
     {
-        "Kestrel": {
-          "EndpointDefaults": {
-                "Protocols": "Http2"
-          },
-          "Endpoints": {
-            "HealthCheck": {
-                "Url": "http://*:{{ .Values.service.port }}",
-                "Protocols": "Http1"
-            },
-            "Grpc": {
-                "Url": "http://*:{{ .Values.servicegrpc.port }}"
-            }
-          }
-        },
-        "GameInterfaceSetting": {
-          "WithdrawalRetryCount": 1,
-           "WithdrawalIntervalSeconds": 30
+      "Logging": {
+        "LogLevel": {
+          "Default": "Warning",
+          "Microsoft.AspNetCore": "Warning",
+          "Tgs.GameInterface.JDBService.Core": "Information"
         }
+      },
+      "Kestrel": {
+        "EndpointDefaults": {
+          "Protocols": "Http2"
+        },
+        "Endpoints": {
+          "HealthCheck": {
+            "Url": "http://*:{{ .Values.service.port }}",
+            "Protocols": "Http1"
+          },
+          "Grpc": {
+            "Url": "http://*:{{ .Values.servicegrpc.port }}"
+          }
+        }
+      },
+      "GameInterfaceSetting": {
+        "WithdrawalRetryCount": 1,
+        "WithdrawalIntervalSeconds": 30
+      }
     }
   monitor.settings.json: |
     {
