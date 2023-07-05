@@ -1,4 +1,4 @@
-syntax = "proto3";
+﻿syntax = "proto3";
 
 import "phoenix/protobuf/decimal.proto";
 import "google/protobuf/timestamp.proto";
@@ -19,6 +19,7 @@ service GameInterfaceJDBService {
   rpc GameUrl (GameUrlRequest) returns (GameUrlReply);
   rpc GameHistory (GameHistoryRequest) returns (GameHistoryReply);
   rpc GameOldHistory (GameHistoryRequest) returns (GameHistoryReply);
+  rpc CheckingService(CheckingServiceRequest) returns (CheckingServiceReply);
 }
 
 // The request message containing the user's name.
@@ -90,6 +91,10 @@ message GameHistoryRequest {
 	google.protobuf.Timestamp end_time = 7;
 }
 
+message CheckingServiceRequest{
+    string machine_name = 1;
+}
+
 // The response message containing the greetings.
 message BaseReply{
 	bool status = 1;
@@ -134,4 +139,8 @@ message GameHistoryInfo {
 	phoenix.protobuf.DecimalValue turnover = 9;
 	phoenix.protobuf.DecimalValue settle = 10;
 	string additional_data = 11;
+}
+
+message CheckingServiceReply{
+    string machine_name = 1;
 }

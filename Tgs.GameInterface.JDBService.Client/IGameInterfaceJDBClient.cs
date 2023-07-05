@@ -4,6 +4,10 @@ namespace Tgs.GameInterface.JDBService.Client;
 
 public interface IGameInterfaceJDBClient
 {
+    ValueTask<string> CheckingServiceAsync(
+        string machineName,
+        CancellationToken cancellationToken = default);
+
     ValueTask<FundReply> FundInAsync(
         Uri apiUrl,
         string domain,

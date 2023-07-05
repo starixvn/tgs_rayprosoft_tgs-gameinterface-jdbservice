@@ -9,6 +9,7 @@ namespace Tgs.GameInterface.JDBService.GrpcServices;
 
 public class GameInterfaceJDBGrpcService : GameInterfaceJDBService.GameInterfaceJDBServiceBase
 {
+    private readonly ILogger<GameInterfaceJDBGrpcService> _logger;
     private readonly IGetService<PlayerBalanceQuery, PlayerBalanceResult> _playerBalanceService;
     private readonly ICommandService<PlayerCreateCommand> _playerCreateService;
     private readonly ICommandService<PlayerKickCommand> _playerKickService;
@@ -20,6 +21,7 @@ public class GameInterfaceJDBGrpcService : GameInterfaceJDBService.GameInterface
     private readonly IQueryService<GameOldHistoryQuery, GameHistoryResult> _gameOldHistoryService;
 
     public GameInterfaceJDBGrpcService(
+        ILogger<GameInterfaceJDBGrpcService> logger,
         IGetService<PlayerBalanceQuery, PlayerBalanceResult> playerBalanceService,
         ICommandService<PlayerCreateCommand> PlayerCreateService,
         ICommandService<PlayerKickCommand> playerKickService,
@@ -31,6 +33,7 @@ public class GameInterfaceJDBGrpcService : GameInterfaceJDBService.GameInterface
         IQueryService<GameOldHistoryQuery, GameHistoryResult> gameOldHistoryService
         )
     {
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _playerBalanceService = playerBalanceService ?? throw new ArgumentNullException(nameof(playerBalanceService));
         _playerCreateService = PlayerCreateService ?? throw new ArgumentNullException(nameof(PlayerCreateService));
         _playerKickService = playerKickService ?? throw new ArgumentNullException(nameof(playerKickService));
@@ -40,6 +43,16 @@ public class GameInterfaceJDBGrpcService : GameInterfaceJDBService.GameInterface
         _gameUrlService = gameUrlService ?? throw new ArgumentNullException(nameof(gameUrlService));
         _gameHistoryService = gameHistoryService ?? throw new ArgumentNullException(nameof(gameHistoryService));
         _gameOldHistoryService = gameOldHistoryService ?? throw new ArgumentNullException(nameof(gameOldHistoryService));
+    }
+
+    public override Task<CheckingServiceReply> CheckingService(CheckingServiceRequest request, ServerCallContext context)
+    {
+        _logger.LogWarning("LogOn:{logOn} Message: Create a check connection.({machineName})", DateTime.Now.ToString("o"), request.MachineName);
+
+        return Task.FromResult(new CheckingServiceReply
+        {
+            MachineName = Environment.MachineName
+        });
     }
 
     public override async Task<FundReply> FundIn(FundRequest request, ServerCallContext context)
