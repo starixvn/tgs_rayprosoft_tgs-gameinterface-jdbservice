@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Tgs.GameInterface.JDBService.Core.ApplicationServices;
 using Tgs.GameInterface.JDBService.Core.Models;
 using Tgs.GameInterface.JDBService.ViewModels;
