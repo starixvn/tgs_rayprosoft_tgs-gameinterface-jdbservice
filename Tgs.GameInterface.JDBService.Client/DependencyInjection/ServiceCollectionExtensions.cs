@@ -20,6 +20,7 @@ public static class ServiceCollectionExtensions
             .AddGrpcClient<GameInterfaceJDBService.GameInterfaceJDBServiceClient>((sp, configureClient) =>
             {
                 var options = sp.GetRequiredService<IOptions<GameInterfaceJDBClientOptions>>().Value;
+                isDns = options.BaseUrl.Scheme.Equals("dns", StringComparison.OrdinalIgnoreCase);
                 configureClient.Address = options.BaseUrl;
             })
             .ConfigureChannel((sp, configureChannel) =>
@@ -32,7 +33,9 @@ public static class ServiceCollectionExtensions
                     EnableMultipleHttp2Connections = true
                 };
                 configureChannel.HttpHandler = handler;
-                configureChannel.Credentials = ChannelCredentials.Insecure;
+                configureChannel.Credentials = isDns
+                ? ChannelCredentials.Insecure
+                : null;
             })
             .AddInterceptor<LoggingInterceptor>()
             .Services
