@@ -6,15 +6,14 @@ using Microsoft.Extensions.Options;
 using NSubstitute;
 using RichardSzalay.MockHttp;
 
-namespace Tgs.GameInterface.JDBService.Core.UnitTest.GameApiClientUnitTest;
+namespace Tgs.GameInterface.JDBService.Core.UnitTest;
 
-[TestClass]
 public class KickOutPlayerUnitTest
 {
-    [TestMethod]
+    [Fact]
     public async Task Normal_Process()
     {
-        var apiUrl = new Uri("http://api.jygrq.com");
+        var apiUrl = new Uri("http://localhost/");
         var domain = "ZF";
         var aesKey = "831057181dd07807";
         var aesIV = "193a3159afebee65";
@@ -51,8 +50,9 @@ public class KickOutPlayerUnitTest
         var url = new Uri(apiUrl, "/apiRequest.do");
 
         var handler = new MockHttpMessageHandler();
-        _ = handler.Expect(HttpMethod.Post, url.ToString())
-                        .Respond(HttpStatusCode.OK, new StringContent("{\"status\":\"0000\"}"));
+        _ = handler
+            .Expect(HttpMethod.Post, url.ToString())
+            .Respond(HttpStatusCode.OK, new StringContent("{\"status\":\"0000\"}"));
 
         var fakeHttpClient = handler.ToHttpClient();
 

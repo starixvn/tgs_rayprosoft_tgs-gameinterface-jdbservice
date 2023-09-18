@@ -50,6 +50,7 @@ public interface IGameInterfaceJDBClient
         string lang,
         CancellationToken cancellationToken = default);
 
+    [Obsolete("已過時，請改使用GameWager")]
     IAsyncEnumerable<GameHistoryInfo> GameHistoryAsync(
         Uri apiUrl,
         string domain,
@@ -60,7 +61,28 @@ public interface IGameInterfaceJDBClient
         DateTime endTime,
         CancellationToken cancellationToken = default);
 
+    [Obsolete("已過時，請改使用GameWagerOld")]
     IAsyncEnumerable<GameHistoryInfo> GameOldHistoryAsync(
+        Uri apiUrl,
+        string domain,
+        string aesKey,
+        string aesIV,
+        string agent,
+        DateTime startTime,
+        DateTime endTime,
+        CancellationToken cancellationToken = default);
+
+    IAsyncEnumerable<GameWagerInfo> GameWagerAsync(
+        Uri apiUrl,
+        string domain,
+        string aesKey,
+        string aesIV,
+        string agent,
+        DateTime startTime,
+        DateTime endTime,
+        CancellationToken cancellationToken = default);
+
+    IAsyncEnumerable<GameWagerInfo> GameWagerOldAsync(
         Uri apiUrl,
         string domain,
         string aesKey,

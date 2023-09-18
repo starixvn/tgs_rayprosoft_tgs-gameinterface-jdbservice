@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Microsoft.Extensions.Internal;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -7,15 +8,14 @@ using NSubstitute;
 using RichardSzalay.MockHttp;
 using Tgs.GameInterface.JDBService.Core.Exceptions;
 
-namespace Tgs.GameInterface.JDBService.Core.UnitTest.GameApiClientUnitTest;
+namespace Tgs.GameInterface.JDBService.Core.UnitTest;
 
-[TestClass]
 public class DepositUnitTest
 {
-    [TestMethod]
+    [Fact]
     public async Task Normal_Process()
     {
-        var apiUrl = new Uri("http://api.jygrq.com");
+        var apiUrl = new Uri("http://localhost/");
         var domain = "ZF";
         var aesKey = "831057181dd07807";
         var aesIV = "193a3159afebee65";
@@ -55,10 +55,20 @@ public class DepositUnitTest
             Arg.Is(aesIV)).Returns(encryptedData);
 
         var url = new Uri(apiUrl, "/apiRequest.do");
-
+        var respond = new JsonObject
+        {
+            ["status"] = "0000",
+            ["userBalance"] = 1.0m,
+            ["agentCashBalance"] = 0.0m,
+            ["amount"] = 1.0m,
+            ["pid"] = 4960023,
+            ["payDate"] = "06-09-2022 04:16:39",
+            ["serialNo"] = "1662442853",
+        };
         var handler = new MockHttpMessageHandler();
-        _ = handler.Expect(HttpMethod.Post, url.ToString())
-                        .Respond(HttpStatusCode.OK, new StringContent("{\"status\":\"0000\",\"userBalance\":1.0,\"agentCashBalance\":0.0,\"amount\":1.0,\"pid\":4960023,\"payDate\":\"06-09-2022 04:16:39\",\"serialNo\":\"1662452123\"}"));
+        _ = handler
+            .Expect(HttpMethod.Post, url.ToString())
+            .Respond(HttpStatusCode.OK, new StringContent(respond.ToJsonString()));
 
         var fakeHttpClient = handler.ToHttpClient();
 
@@ -81,15 +91,15 @@ public class DepositUnitTest
                 amount)
              .ConfigureAwait(false);
 
-        Assert.IsNotNull(actual);
-        Assert.AreEqual(1m, actual.UserBalance);
-        Assert.AreEqual(1m, actual.Amount);
+        Assert.NotNull(actual);
+        Assert.Equal("1662442853", actual.SerialNo);
+        Assert.Equal(respond.ToJsonString(), actual.Resp);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task Status_6009_Exception()
     {
-        var apiUrl = new Uri("http://api.jygrq.com");
+        var apiUrl = new Uri("http://localhost/");
         var domain = "ZF";
         var aesKey = "831057181dd07807";
         var aesIV = "193a3159afebee65";
@@ -129,10 +139,15 @@ public class DepositUnitTest
             Arg.Is(aesIV)).Returns(encryptedData);
 
         var url = new Uri(apiUrl, "/apiRequest.do");
-
+        var respond = new JsonObject
+        {
+            ["status"] = "6009",
+            ["err_text"] = "The deposit amount exceeds the upper limit."
+        };
         var handler = new MockHttpMessageHandler();
-        _ = handler.Expect(HttpMethod.Post, url.ToString())
-                        .Respond(HttpStatusCode.OK, new StringContent("{\"status\":\"6009\",\"err_text\":\"The deposit amount exceeds the upper limit.\"}"));
+        _ = handler
+            .Expect(HttpMethod.Post, url.ToString())
+            .Respond(HttpStatusCode.OK, new StringContent(respond.ToJsonString()));
 
         var fakeHttpClient = handler.ToHttpClient();
 
@@ -143,7 +158,7 @@ public class DepositUnitTest
             fakeAesSystemClock,
             fakeAesCryptography);
 
-        _ = await Assert.ThrowsExceptionAsync<Status_6009_Exception>(async () => await client
+        _ = await Assert.ThrowsAsync<Status_6009_Exception>(async () => await client
               .DepositAsync(
                  apiUrl,
                  domain,
@@ -156,10 +171,10 @@ public class DepositUnitTest
               .ConfigureAwait(false));
     }
 
-    [TestMethod]
+    [Fact]
     public async Task Status_6010_Exception()
     {
-        var apiUrl = new Uri("http://api.jygrq.com");
+        var apiUrl = new Uri("http://localhost/");
         var domain = "ZF";
         var aesKey = "831057181dd07807";
         var aesIV = "193a3159afebee65";
@@ -199,10 +214,15 @@ public class DepositUnitTest
             Arg.Is(aesIV)).Returns(encryptedData);
 
         var url = new Uri(apiUrl, "/apiRequest.do");
-
+        var respond = new JsonObject
+        {
+            ["status"] = "6010",
+            ["err_text"] = "Balance exceeds the upper limit."
+        };
         var handler = new MockHttpMessageHandler();
-        _ = handler.Expect(HttpMethod.Post, url.ToString())
-                        .Respond(HttpStatusCode.OK, new StringContent("{\"status\":\"6010\",\"err_text\":\"Balance exceeds the upper limit.\"}"));
+        _ = handler
+            .Expect(HttpMethod.Post, url.ToString())
+            .Respond(HttpStatusCode.OK, new StringContent(respond.ToJsonString()));
 
         var fakeHttpClient = handler.ToHttpClient();
 
@@ -213,7 +233,7 @@ public class DepositUnitTest
             fakeAesSystemClock,
             fakeAesCryptography);
 
-        _ = await Assert.ThrowsExceptionAsync<Status_6010_Exception>(async () => await client
+        _ = await Assert.ThrowsAsync<Status_6010_Exception>(async () => await client
               .DepositAsync(
                  apiUrl,
                  domain,

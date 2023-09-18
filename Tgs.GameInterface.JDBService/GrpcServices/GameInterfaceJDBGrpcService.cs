@@ -19,6 +19,8 @@ public class GameInterfaceJDBGrpcService : GameInterfaceJDBService.GameInterface
     private readonly IGetService<GameUrlQuery, GameUrlResult> _gameUrlService;
     private readonly IQueryService<GameHistoryQuery, GameHistoryResult> _gameHistoryService;
     private readonly IQueryService<GameOldHistoryQuery, GameHistoryResult> _gameOldHistoryService;
+    private readonly IQueryService<GameWagerQuery, GameWagerResult> _gameWagerService;
+    private readonly IQueryService<GameWagerOldQuery, GameWagerResult> _gameWagerOldService;
 
     public GameInterfaceJDBGrpcService(
         ILogger<GameInterfaceJDBGrpcService> logger,
@@ -30,7 +32,9 @@ public class GameInterfaceJDBGrpcService : GameInterfaceJDBService.GameInterface
         IGetService<FundStatusQuery, bool> fundStatusService,
         IGetService<GameUrlQuery, GameUrlResult> gameUrlService,
         IQueryService<GameHistoryQuery, GameHistoryResult> gameHistoryService,
-        IQueryService<GameOldHistoryQuery, GameHistoryResult> gameOldHistoryService
+        IQueryService<GameOldHistoryQuery, GameHistoryResult> gameOldHistoryService,
+        IQueryService<GameWagerQuery, GameWagerResult> gameWagerService,
+        IQueryService<GameWagerOldQuery, GameWagerResult> gameWagerOldService
         )
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -43,6 +47,8 @@ public class GameInterfaceJDBGrpcService : GameInterfaceJDBService.GameInterface
         _gameUrlService = gameUrlService ?? throw new ArgumentNullException(nameof(gameUrlService));
         _gameHistoryService = gameHistoryService ?? throw new ArgumentNullException(nameof(gameHistoryService));
         _gameOldHistoryService = gameOldHistoryService ?? throw new ArgumentNullException(nameof(gameOldHistoryService));
+        _gameWagerService = gameWagerService ?? throw new ArgumentNullException(nameof(gameWagerService));
+        _gameWagerOldService = gameWagerOldService ?? throw new ArgumentNullException(nameof(gameWagerOldService));
     }
 
     public override Task<CheckingServiceReply> CheckingService(CheckingServiceRequest request, ServerCallContext context)
@@ -75,12 +81,8 @@ public class GameInterfaceJDBGrpcService : GameInterfaceJDBService.GameInterface
 
         return new FundReply()
         {
-            Pid = result.Pid,
             SerialNo = result.SerialNo,
-            PayDate = result.PayDate.ToTimestamp(),
-            Amount = result.Amount,
-            UserBalance = result.UserBalance,
-            AgentCashBalance = result.AgentCashBalance
+            Resp = result.Resp
         };
     }
 
@@ -104,12 +106,8 @@ public class GameInterfaceJDBGrpcService : GameInterfaceJDBService.GameInterface
 
         return new FundReply()
         {
-            Pid = result.Pid,
             SerialNo = result.SerialNo,
-            PayDate = result.PayDate.ToTimestamp(),
-            Amount = result.Amount,
-            UserBalance = result.UserBalance,
-            AgentCashBalance = result.AgentCashBalance
+            Resp = result.Resp
         };
     }
 
@@ -148,10 +146,11 @@ public class GameInterfaceJDBGrpcService : GameInterfaceJDBService.GameInterface
 
         var results = await _gameHistoryService
             .QueryAsync(
-                query: query,
-                cancellationToken: context.CancellationToken)
+            query: query,
+            cancellationToken: context.CancellationToken)
             .ToArrayAsync()
-            .ConfigureAwait(false);
+            .ConfigureAwait(false)
+            ?? Enumerable.Empty<GameHistoryResult>();
 
         var reply = new GameHistoryReply();
 
@@ -192,10 +191,11 @@ public class GameInterfaceJDBGrpcService : GameInterfaceJDBService.GameInterface
 
         var results = await _gameOldHistoryService
             .QueryAsync(
-                query: query,
-                cancellationToken: context.CancellationToken)
+            query: query,
+            cancellationToken: context.CancellationToken)
             .ToArrayAsync()
-            .ConfigureAwait(false);
+            .ConfigureAwait(false)
+            ?? Enumerable.Empty<GameHistoryResult>();
 
         var reply = new GameHistoryReply();
 
@@ -246,6 +246,96 @@ public class GameInterfaceJDBGrpcService : GameInterfaceJDBService.GameInterface
             IsPlayerExist = result.IsPlayerExist,
             GameUrl = result.GameUrl
         };
+    }
+
+    public override async Task<GameWagerReply> GameWager(GameWagerRequest request, ServerCallContext context)
+    {
+        var query = new GameWagerQuery(
+        new Uri(request.ApiUrl),
+        request.Domain,
+        request.AesKey,
+        request.AesIV,
+        request.Agent,
+        request.StartTime.ToDateTime(),
+        request.EndTime.ToDateTime());
+
+        var results = await _gameWagerService
+            .QueryAsync(
+            query: query,
+            cancellationToken: context.CancellationToken)
+            .ToArrayAsync()
+            .ConfigureAwait(false)
+            ?? Enumerable.Empty<GameWagerResult>();
+
+        var reply = new GameWagerReply();
+
+        if (results.Any())
+        {
+            foreach (var result in results)
+            {
+                reply.Items.Add(new GameWagerInfo()
+                {
+                    PlayerCode = result.PlayerCode,
+                    ExternalWagerId = result.ExternalWagerId,
+                    ExternalGameId = result.ExternalGameId,
+                    FreeGameState = result.FreeGameState,
+                    GambleState = result.GambleState,
+                    ExternalCreatedOn = result.ExternalCreatedOn.ToTimestamp(),
+                    ExternalClosedOn = result.ExternalClosedOn.ToTimestamp(),
+                    Bet = result.Bet,
+                    Settle = result.Settle,
+                    WinLoss = result.WinLoss,
+                    AdditionalData = result.AdditionalData
+                });
+            }
+        }
+
+        return reply;
+    }
+
+    public override async Task<GameWagerReply> GameWagerOld(GameWagerRequest request, ServerCallContext context)
+    {
+        var query = new GameWagerOldQuery(
+        new Uri(request.ApiUrl),
+        request.Domain,
+        request.AesKey,
+        request.AesIV,
+        request.Agent,
+        request.StartTime.ToDateTime(),
+        request.EndTime.ToDateTime());
+
+        var results = await _gameWagerOldService
+            .QueryAsync(
+            query: query,
+            cancellationToken: context.CancellationToken)
+            .ToArrayAsync()
+            .ConfigureAwait(false)
+            ?? Enumerable.Empty<GameWagerResult>();
+
+        var reply = new GameWagerReply();
+
+        if (results.Any())
+        {
+            foreach (var result in results)
+            {
+                reply.Items.Add(new GameWagerInfo()
+                {
+                    PlayerCode = result.PlayerCode,
+                    ExternalWagerId = result.ExternalWagerId,
+                    ExternalGameId = result.ExternalGameId,
+                    FreeGameState = result.FreeGameState,
+                    GambleState = result.GambleState,
+                    ExternalCreatedOn = result.ExternalCreatedOn.ToTimestamp(),
+                    ExternalClosedOn = result.ExternalClosedOn.ToTimestamp(),
+                    Bet = result.Bet,
+                    Settle = result.Settle,
+                    WinLoss = result.WinLoss,
+                    AdditionalData = result.AdditionalData
+                });
+            }
+        }
+
+        return reply;
     }
 
     public override async Task<PlayerBalanceReply> PlayerBalance(PlayerBalanceRequest request, ServerCallContext context)

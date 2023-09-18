@@ -5,22 +5,20 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NSubstitute;
 using RichardSzalay.MockHttp;
-using Tgs.GameInterface.JDBService.Core.Exceptions;
 
-namespace Tgs.GameInterface.JDBService.Core.UnitTest.GameApiClientUnitTest;
+namespace Tgs.GameInterface.JDBService.Core.UnitTest;
 
-[TestClass]
-public class CheckCashTransferUnitTest
+public class SearchPlayerInformationUnitTest
 {
-    [TestMethod]
+    [Fact]
     public async Task Normal_Process()
     {
-        var apiUrl = new Uri("http://api.jygrq.com");
+        var apiUrl = new Uri("http://localhost/");
         var domain = "ZF";
         var aesKey = "831057181dd07807";
         var aesIV = "193a3159afebee65";
         var agent = "zf055gpi";
-        var serialNo = "1662442853";
+        var playerCode = "4ucmqplxhfoe";
 
         var gameInterfaceSetting = Options.Create(new GameInterfaceSettingOptions()
         {
@@ -38,10 +36,10 @@ public class CheckCashTransferUnitTest
         var encryptedData = Guid.NewGuid().ToString("N");
         var data = new
         {
-            action = 55,
+            action = 15,
             ts = currentTime.ToUnixTimeMilliseconds(),
             parent = agent,
-            serialNo
+            uid = playerCode
         };
         var jsonString = JsonSerializer.Serialize(data);
         _ = fakeAesCryptography.GetAesEncryptAsync(
@@ -52,8 +50,9 @@ public class CheckCashTransferUnitTest
         var url = new Uri(apiUrl, "/apiRequest.do");
 
         var handler = new MockHttpMessageHandler();
-        _ = handler.Expect(HttpMethod.Post, url.ToString())
-                        .Respond(HttpStatusCode.OK, new StringContent("{\"status\":\"0000\",\"data\":[{\"uid\":\"4ucmqplxhfoe\",\"action\":\"deposit\",\"amount\":1,\"plsBalance\":1,\"date\":\"06-09-2022 04:20:47\",\"pid\":4960027,\"remark\":\"\",\"afterBalance\":2}]}"));
+        _ = handler
+            .Expect(HttpMethod.Post, url.ToString())
+            .Respond(HttpStatusCode.OK, new StringContent("{\"status\":\"0000\",\"data\":[{\"uid\":\"4ucmqplxhfoe\",\"balance\":1.0,\"parent\":\"zf055gpi\",\"username\":\"4ucmqplxhfoe\",\"currency\":\"RB\",\"lvl\":0,\"locked\":0,\"closed\":0,\"jackpotFlag\":0}]}"));
 
         var fakeHttpClient = handler.ToHttpClient();
 
@@ -64,29 +63,28 @@ public class CheckCashTransferUnitTest
             fakeAesSystemClock,
             fakeAesCryptography);
 
-        var actual = await client
-             .CheckCashTransferAsync(
+        var (IsPlayerExist, Balance) = await client.SearchPlayerInformationAsync(
                 apiUrl,
                 domain,
                 aesKey,
                 aesIV,
                 agent,
-                serialNo)
-             .ConfigureAwait(false);
+                playerCode
+             ).ConfigureAwait(false);
 
-        Assert.IsNotNull(actual);
-        Assert.IsTrue(actual);
+        Assert.True(IsPlayerExist);
+        Assert.Equal(1m, Balance);
     }
 
-    [TestMethod]
-    public async Task Status_9015_Exception()
+    [Fact]
+    public async Task Player_Does_Not_Exist()
     {
-        var apiUrl = new Uri("http://api.jygrq.com");
+        var apiUrl = new Uri("http://localhost/");
         var domain = "ZF";
         var aesKey = "831057181dd07807";
         var aesIV = "193a3159afebee65";
         var agent = "zf055gpi";
-        var serialNo = "1662442853";
+        var playerCode = "4ucmqplxhfoe";
 
         var gameInterfaceSetting = Options.Create(new GameInterfaceSettingOptions()
         {
@@ -104,10 +102,10 @@ public class CheckCashTransferUnitTest
         var encryptedData = Guid.NewGuid().ToString("N");
         var data = new
         {
-            action = 55,
+            action = 15,
             ts = currentTime.ToUnixTimeMilliseconds(),
             parent = agent,
-            serialNo
+            uid = playerCode
         };
         var jsonString = JsonSerializer.Serialize(data);
         _ = fakeAesCryptography.GetAesEncryptAsync(
@@ -118,8 +116,9 @@ public class CheckCashTransferUnitTest
         var url = new Uri(apiUrl, "/apiRequest.do");
 
         var handler = new MockHttpMessageHandler();
-        _ = handler.Expect(HttpMethod.Post, url.ToString())
-                        .Respond(HttpStatusCode.OK, new StringContent("{\"status\":\"9015\",\"err_text\":\"Data does not exist.\"}"));
+        _ = handler
+            .Expect(HttpMethod.Post, url.ToString())
+            .Respond(HttpStatusCode.OK, new StringContent("{\"status\":\"7501\",\"err_text\":\"User ID cannot be found.\"}"));
 
         var fakeHttpClient = handler.ToHttpClient();
 
@@ -129,15 +128,15 @@ public class CheckCashTransferUnitTest
             fakeHttpClient,
             fakeAesSystemClock,
             fakeAesCryptography);
+        var (IsPlayerExist, _) = await client.SearchPlayerInformationAsync(
+                apiUrl,
+                domain,
+                aesKey,
+                aesIV,
+                agent,
+                playerCode
+             ).ConfigureAwait(false);
 
-        _ = await Assert.ThrowsExceptionAsync<GameProvisioningErrorException>(async () => await client
-              .CheckCashTransferAsync(
-                 apiUrl,
-                 domain,
-                 aesKey,
-                 aesIV,
-                 agent,
-                 serialNo)
-              .ConfigureAwait(false));
+        Assert.False(IsPlayerExist);
     }
 }

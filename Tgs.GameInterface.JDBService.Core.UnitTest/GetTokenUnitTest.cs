@@ -6,15 +6,14 @@ using Microsoft.Extensions.Options;
 using NSubstitute;
 using RichardSzalay.MockHttp;
 
-namespace Tgs.GameInterface.JDBService.Core.UnitTest.GameApiClientUnitTest;
+namespace Tgs.GameInterface.JDBService.Core.UnitTest;
 
-[TestClass]
 public class GetTokenUnitTest
 {
-    [TestMethod]
+    [Fact]
     public async Task Normal_Process()
     {
-        var apiUrl = new Uri("http://api.jygrq.com");
+        var apiUrl = new Uri("http://localhost/");
         var domain = "ZF";
         var aesKey = "831057181dd07807";
         var aesIV = "193a3159afebee65";
@@ -71,7 +70,7 @@ public class GetTokenUnitTest
             fakeAesSystemClock,
             fakeAesCryptography);
 
-        var actual = await client.GetTokenAsync(
+        var (IsPlayerExist, GameUrl) = await client.GetTokenAsync(
                 apiUrl,
                 domain,
                 aesKey,
@@ -82,15 +81,14 @@ public class GetTokenUnitTest
                 lang
              ).ConfigureAwait(false);
 
-        Assert.IsNotNull(actual);
-        Assert.IsTrue(actual.IsPlayerExist);
-        Assert.AreEqual("https://localhost/", actual.GameUrl);
+        Assert.True(IsPlayerExist);
+        Assert.Equal("https://localhost/", GameUrl);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task Player_Does_Not_Exist()
     {
-        var apiUrl = new Uri("http://api.jygrq.com");
+        var apiUrl = new Uri("http://localhost/");
         var domain = "ZF";
         var aesKey = "831057181dd07807";
         var aesIV = "193a3159afebee65";
@@ -146,8 +144,7 @@ public class GetTokenUnitTest
             fakeHttpClient,
             fakeAesSystemClock,
             fakeAesCryptography);
-
-        var actual = await client.GetTokenAsync(
+        var (IsPlayerExist, _) = await client.GetTokenAsync(
                 apiUrl,
                 domain,
                 aesKey,
@@ -158,7 +155,6 @@ public class GetTokenUnitTest
                 lang
              ).ConfigureAwait(false);
 
-        Assert.IsNotNull(actual);
-        Assert.IsFalse(actual.IsPlayerExist);
+        Assert.False(IsPlayerExist);
     }
 }

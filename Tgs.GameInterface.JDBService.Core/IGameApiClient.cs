@@ -22,7 +22,7 @@ public interface IGameApiClient
         string playerCode,
         CancellationToken cancellationToken = default);
 
-    ValueTask<TransactionResponse> DepositAsync(
+    ValueTask<TransactionResp> DepositAsync(
         Uri apiUrl,
         string domain,
         string aesKey,
@@ -42,7 +42,7 @@ public interface IGameApiClient
         string serialNo,
         CancellationToken cancellationToken = default);
 
-    IAsyncEnumerable<GameHistoryResult> SearchGameTransactionDetailsAsync(
+    IAsyncEnumerable<GameDetailTransactionResp> SearchGameTransactionDetailsAsync(
         Uri apiUrl,
         string domain,
         string aesKey,
@@ -52,7 +52,7 @@ public interface IGameApiClient
         DateTime endTime,
         CancellationToken cancellationToken = default);
 
-    IAsyncEnumerable<GameHistoryResult> SearchGameOldTransactionDetailsAsync(
+    IAsyncEnumerable<GameDetailTransactionResp> SearchGameOldTransactionDetailsAsync(
         Uri apiUrl,
         string domain,
         string aesKey,
@@ -82,7 +82,7 @@ public interface IGameApiClient
         string playerCode,
         CancellationToken cancellationToken = default);
 
-    ValueTask<TransactionResponse> WithdrawalAsync(
+    ValueTask<TransactionResp> WithdrawalAsync(
         Uri apiUrl,
         string domain,
         string aesKey,

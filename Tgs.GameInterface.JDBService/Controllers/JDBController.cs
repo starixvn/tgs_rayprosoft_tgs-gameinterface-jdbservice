@@ -54,12 +54,8 @@ public class JDBController : ControllerBase
                  .ConfigureAwait(false);
 
         return new FundResultViewModel(
-            result.Pid,
             result.SerialNo,
-            result.PayDate,
-            result.Amount,
-            result.UserBalance,
-            result.AgentCashBalance);
+            result.Resp);
     }
 
     /// <summary>
@@ -106,12 +102,8 @@ public class JDBController : ControllerBase
                  .ConfigureAwait(false);
 
         return new FundResultViewModel(
-            result.Pid,
             result.SerialNo,
-            result.PayDate,
-            result.Amount,
-            result.UserBalance,
-            result.AgentCashBalance);
+            result.Resp);
     }
 
     /// <summary>
@@ -262,6 +254,70 @@ public class JDBController : ControllerBase
     }
 
     /// <summary>
+    /// Games the wager asynchronous.
+    /// </summary>
+    /// <param name="service">The service.</param>
+    /// <param name="source">The source.</param>
+    /// <returns></returns>
+    /// <remarks>
+    /// <b>Example</b><br />
+    ///
+    ///     Post
+    ///
+    ///         {
+    ///             "apiUrl": "http://api.jygrq.com",
+    ///             "domain": "ZF",
+    ///             "aesKey": "831057181dd07807",
+    ///             "aesIV": "193a3159afebee65",
+    ///             "agent": "zf055gpi",
+    ///             "startTime": "2022-09-07T18:50:00+08:00",
+    ///             "endTime": "2022-09-07T18:55:00+08:00"
+    ///         }
+    /// </remarks>
+    [HttpPost("game/wager", Name = "GameWager")]
+    public async IAsyncEnumerable<GameWagerResultViewModel> GameWagerAsync(
+        [FromServices] IQueryService<GameWagerQuery, GameWagerResult> service,
+        GameWagerViewModel source)
+    {
+        var query = new GameWagerQuery(
+            source.ApiUrl,
+            source.Domain,
+            source.AesKey,
+            source.AesIV,
+            source.Agent,
+            source.StartTime,
+            source.EndTime);
+
+        var results = await service
+            .QueryAsync(
+            query: query,
+            cancellationToken: HttpContext.RequestAborted)
+            .ToArrayAsync()
+            .ConfigureAwait(false);
+
+        if (!results.Any())
+        {
+            yield break;
+        }
+
+        foreach (var result in results)
+        {
+            yield return new GameWagerResultViewModel(
+                result.PlayerCode,
+                result.ExternalWagerId,
+                result.ExternalGameId,
+                result.FreeGameState,
+                result.GambleState,
+                result.ExternalCreatedOn,
+                result.ExternalClosedOn,
+                result.Bet,
+                result.Settle,
+                result.WinLoss,
+                result.AdditionalData);
+        }
+    }
+
+    /// <summary>
     /// Games the old history asynchronous.
     /// </summary>
     /// <param name="service">The service.</param>
@@ -321,6 +377,70 @@ public class JDBController : ControllerBase
                 result.PlayerWinLoss,
                 result.Turnover,
                 result.Settle,
+                result.AdditionalData);
+        }
+    }
+
+    /// <summary>
+    /// Games the wager old asynchronous.
+    /// </summary>
+    /// <param name="service">The service.</param>
+    /// <param name="source">The source.</param>
+    /// <returns></returns>
+    /// <remarks>
+    /// <b>Example</b><br />
+    ///
+    ///     Post
+    ///
+    ///         {
+    ///             "apiUrl": "http://api.jygrq.com",
+    ///             "domain": "ZF",
+    ///             "aesKey": "831057181dd07807",
+    ///             "aesIV": "193a3159afebee65",
+    ///             "agent": "zf055gpi",
+    ///             "startTime": "2022-09-07T18:50:00+08:00",
+    ///             "endTime": "2022-09-07T18:55:00+08:00"
+    ///         }
+    /// </remarks>
+    [HttpPost("game/wager/old", Name = "GameWagerOld")]
+    public async IAsyncEnumerable<GameWagerResultViewModel> GameWagerOldAsync(
+        [FromServices] IQueryService<GameWagerOldQuery, GameWagerResult> service,
+        GameWagerViewModel source)
+    {
+        var query = new GameWagerOldQuery(
+            source.ApiUrl,
+            source.Domain,
+            source.AesKey,
+            source.AesIV,
+            source.Agent,
+            source.StartTime,
+            source.EndTime);
+
+        var results = await service
+            .QueryAsync(
+            query: query,
+            cancellationToken: HttpContext.RequestAborted)
+            .ToArrayAsync()
+            .ConfigureAwait(false);
+
+        if (!results.Any())
+        {
+            yield break;
+        }
+
+        foreach (var result in results)
+        {
+            yield return new GameWagerResultViewModel(
+                result.PlayerCode,
+                result.ExternalWagerId,
+                result.ExternalGameId,
+                result.FreeGameState,
+                result.GambleState,
+                result.ExternalCreatedOn,
+                result.ExternalClosedOn,
+                result.Bet,
+                result.Settle,
+                result.WinLoss,
                 result.AdditionalData);
         }
     }

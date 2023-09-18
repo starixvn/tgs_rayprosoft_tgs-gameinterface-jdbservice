@@ -28,11 +28,7 @@ internal class FundOutGetService : IGetService<FundOutQuery, FundResult>
                     cancellationToken)
                 .ConfigureAwait(false);
         return new FundResult(
-            Pid: result.Pid,
             SerialNo: result.SerialNo,
-            PayDate: result.PayDate,
-            Amount: result.Amount,
-            UserBalance: result.UserBalance,
-            AgentCashBalance: result.AgentCashBalance);
+            Resp: result.Resp);
     }
 }

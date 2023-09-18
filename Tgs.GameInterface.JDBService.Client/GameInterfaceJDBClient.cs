@@ -219,6 +219,80 @@ internal class GameInterfaceJDBClient : IGameInterfaceJDBClient
             .ConfigureAwait(false);
     }
 
+    public async IAsyncEnumerable<GameWagerInfo> GameWagerAsync(
+        Uri apiUrl,
+        string domain,
+        string aesKey,
+        string aesIV,
+        string agent,
+        DateTime startTime,
+        DateTime endTime,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        var request = new GameWagerRequest
+        {
+            ApiUrl = apiUrl.ToString(),
+            Domain = domain,
+            AesKey = aesKey,
+            AesIV = aesIV,
+            Agent = agent,
+            StartTime = startTime.ToTimestamp(),
+            EndTime = endTime.ToTimestamp()
+        };
+        var reply = await _client
+            .GameWagerAsync(
+            request: request,
+            cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+
+        if (!reply.Items.Any())
+        {
+            yield break;
+        }
+
+        foreach (var item in reply.Items ?? Enumerable.Empty<GameWagerInfo>())
+        {
+            yield return item;
+        }
+    }
+
+    public async IAsyncEnumerable<GameWagerInfo> GameWagerOldAsync(
+        Uri apiUrl,
+        string domain,
+        string aesKey,
+        string aesIV,
+        string agent,
+        DateTime startTime,
+        DateTime endTime,
+       [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        var request = new GameWagerRequest
+        {
+            ApiUrl = apiUrl.ToString(),
+            Domain = domain,
+            AesKey = aesKey,
+            AesIV = aesIV,
+            Agent = agent,
+            StartTime = startTime.ToTimestamp(),
+            EndTime = endTime.ToTimestamp()
+        };
+        var reply = await _client
+            .GameWagerOldAsync(
+            request: request,
+            cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+
+        if (!reply.Items.Any())
+        {
+            yield break;
+        }
+
+        foreach (var item in reply.Items ?? Enumerable.Empty<GameWagerInfo>())
+        {
+            yield return item;
+        }
+    }
+
     public async ValueTask<PlayerBalanceReply> PlayerBalanceAsync(
         Uri apiUrl,
         string domain,

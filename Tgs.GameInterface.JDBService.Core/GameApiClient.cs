@@ -19,7 +19,6 @@ internal class GameApiClient : IGameApiClient
     private readonly HttpClient _httpClient;
     private readonly ISystemClock _systemClock;
     private readonly IAesCryptography _aesCryptography;
-    private readonly TimeZoneInfo _timeZone;
     private readonly JsonSerializerOptions _jsonSerializerOptions;
 
     public GameApiClient(
@@ -34,7 +33,6 @@ internal class GameApiClient : IGameApiClient
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         _systemClock = systemClock ?? throw new ArgumentNullException(nameof(systemClock));
         _aesCryptography = aesCryptography ?? throw new ArgumentNullException(nameof(aesCryptography));
-        _timeZone = TimeZoneInfo.CreateCustomTimeZone(id: "eastern time", baseUtcOffset: TimeSpan.FromHours(-4), "eastern time", "eastern time");
         _jsonSerializerOptions = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -79,12 +77,7 @@ internal class GameApiClient : IGameApiClient
                     cancellationToken)
                 .ConfigureAwait(false);
 
-        var status = jsonNode["status"]!.ToString();
-        var errText = jsonNode["err_text"]?.ToString();
-
-        return !status.Equals("0000", StringComparison.OrdinalIgnoreCase)
-            ? throw new GameProvisioningErrorException(status, errText ?? string.Empty)
-            : true;
+        return jsonNode["status"]!.ToString().Equals("0000", StringComparison.OrdinalIgnoreCase);
     }
 
     public async ValueTask CreatePlayerAsync(
@@ -130,7 +123,7 @@ internal class GameApiClient : IGameApiClient
         }
     }
 
-    public async ValueTask<TransactionResponse> DepositAsync(
+    public async ValueTask<TransactionResp> DepositAsync(
         Uri apiUrl,
         string domain,
         string aesKey,
@@ -177,10 +170,12 @@ internal class GameApiClient : IGameApiClient
             ? throw new Status_6010_Exception(amount)
             : !status.Equals("0000", StringComparison.OrdinalIgnoreCase)
             ? throw new GameProvisioningErrorException(status, errText ?? string.Empty)
-            : jsonNode.Deserialize<TransactionResponse>(_jsonSerializerOptions)!;
+            : new TransactionResp(
+                SerialNo: jsonNode["serialNo"]!.ToString(),
+                Resp: jsonNode.ToJsonString());
     }
 
-    public async IAsyncEnumerable<GameHistoryResult> SearchGameTransactionDetailsAsync(
+    public async IAsyncEnumerable<GameDetailTransactionResp> SearchGameTransactionDetailsAsync(
         Uri apiUrl,
         string domain,
         string aesKey,
@@ -190,16 +185,13 @@ internal class GameApiClient : IGameApiClient
         DateTime endTime,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        var startTimeEastern = TimeZoneInfo.ConvertTime(startTime.ToUniversalTime(), _timeZone);
-        var endTimeEastern = TimeZoneInfo.ConvertTime(endTime.ToUniversalTime(), _timeZone);
-
         var data = new
         {
             action = 29,
             ts = _systemClock.UtcNow.ToUnixTimeMilliseconds(),
             parent = agent,
-            starttime = startTimeEastern.ToString("dd-MM-yyyy HH:mm:00"),
-            endtime = endTimeEastern.ToString("dd-MM-yyyy HH:mm:00")
+            starttime = startTime.DatetimeConvertToString(),
+            endtime = endTime.DatetimeConvertToString()
         };
         var jsonString = JsonSerializer.Serialize(data);
         var encryptedData = await _aesCryptography
@@ -225,31 +217,44 @@ internal class GameApiClient : IGameApiClient
             throw new GameProvisioningErrorException(status, errText ?? string.Empty);
         }
 
-        var gameTransactionDetails = jsonNode["data"].Deserialize<IEnumerable<GameTransactionResponse>>(_jsonSerializerOptions);
+        var transactions = jsonNode["data"]!.AsArray();
 
-        if (gameTransactionDetails == null || !gameTransactionDetails.Any())
+        if (!transactions.Any())
         {
             yield break;
         }
 
-        foreach (var gameTransactionDetail in gameTransactionDetails)
+        foreach (var transaction in transactions)
         {
-            yield return new GameHistoryResult(
-                PlayerCode: gameTransactionDetail.PlayerId,
-                ExternalRoundId: gameTransactionDetail.SeqNo.ToString(),
-                ExternalGameId: $"{gameTransactionDetail.GameType}_{gameTransactionDetail.MachineType}",
-                ExternalCreatedOn: gameTransactionDetail.GameDate,
-                ExternalClosedOn: gameTransactionDetail.LastModifyTime,
-                Bet: (gameTransactionDetail.HasGamble == 0) ? -gameTransactionDetail.Bet : -gameTransactionDetail.GambleBet,
-                ValidBet: (gameTransactionDetail.HasGamble == 0) ? -gameTransactionDetail.Bet : -gameTransactionDetail.GambleBet,
-                PlayerWinLoss: gameTransactionDetail.PlayerWinLoss,
-                Turnover: (gameTransactionDetail.HasGamble == 0) ? -gameTransactionDetail.Bet : -gameTransactionDetail.GambleBet,
-                Settle: gameTransactionDetail.Settle,
-                AdditionalData: JsonSerializer.Serialize(gameTransactionDetail));
+            if (transaction is null)
+            {
+                continue;
+            }
+            yield return new GameDetailTransactionResp(
+                HistoryId: transaction["seqNo"]?.GetValue<long>() ?? transaction["historyId"]!.GetValue<long>(),
+                PlayerId: transaction["playerId"]!.ToString(),
+                GameType: transaction["gType"]!.GetValue<int>(),
+                MachineType: transaction["mtype"]!.GetValue<int>(),
+                GameDate: transaction["gameDate"]!.ToString().StringConvertToDatetime(),
+                Bet: -transaction["bet"]!.GetValue<decimal>(),
+                Win: transaction["win"]!.GetValue<decimal>(),
+                Total: transaction["total"]!.GetValue<decimal>(),
+                Currency: transaction["currency"]!.ToString(),
+                Jackpot: transaction["jackpot"]!.GetValue<decimal>(),
+                JackpotContribute: transaction["jackpotContribute"]!.GetValue<decimal>(),
+                Denom: transaction["denom"]!.GetValue<decimal>(),
+                LastModifyTime: transaction["lastModifyTime"]!.ToString().StringConvertToDatetime(),
+                PlayerIp: transaction["playerIp"]!.ToString(),
+                ClientType: transaction["clientType"]!.ToString(),
+                HasFreegame: transaction["hasFreegame"]!.GetValue<int>(),
+                HasGamble: transaction["hasGamble"]!.GetValue<int>(),
+                GambleBet: -transaction["gambleBet"]?.GetValue<decimal>() ?? 0.0m,
+                SystemTakeWin: transaction["systemTakeWin"]!.GetValue<int>(),
+                AdditionalData: transaction.ToJsonString());
         }
     }
 
-    public async IAsyncEnumerable<GameHistoryResult> SearchGameOldTransactionDetailsAsync(
+    public async IAsyncEnumerable<GameDetailTransactionResp> SearchGameOldTransactionDetailsAsync(
         Uri apiUrl,
         string domain,
         string aesKey,
@@ -259,16 +264,13 @@ internal class GameApiClient : IGameApiClient
         DateTime endTime,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        var startTimeEastern = TimeZoneInfo.ConvertTime(startTime.ToUniversalTime(), _timeZone);
-        var endTimeEastern = TimeZoneInfo.ConvertTime(endTime.ToUniversalTime(), _timeZone);
-
         var data = new
         {
             action = 64,
             ts = _systemClock.UtcNow.ToUnixTimeMilliseconds(),
             parent = agent,
-            starttime = startTimeEastern.ToString("dd-MM-yyyy HH:mm:00"),
-            endtime = endTimeEastern.ToString("dd-MM-yyyy HH:mm:00")
+            starttime = startTime.DatetimeConvertToString(),
+            endtime = endTime.DatetimeConvertToString()
         };
         var jsonString = JsonSerializer.Serialize(data);
         var encryptedData = await _aesCryptography
@@ -294,27 +296,40 @@ internal class GameApiClient : IGameApiClient
             throw new GameProvisioningErrorException(status, errText ?? string.Empty);
         }
 
-        var gameTransactionDetails = jsonNode["data"].Deserialize<IEnumerable<GameTransactionResponse>>(_jsonSerializerOptions);
+        var transactions = jsonNode["data"]!.AsArray();
 
-        if (gameTransactionDetails == null || !gameTransactionDetails.Any())
+        if (!transactions.Any())
         {
             yield break;
         }
 
-        foreach (var gameTransactionDetail in gameTransactionDetails)
+        foreach (var transaction in transactions)
         {
-            yield return new GameHistoryResult(
-                PlayerCode: gameTransactionDetail.PlayerId,
-                ExternalRoundId: gameTransactionDetail.SeqNo.ToString(),
-                ExternalGameId: $"{gameTransactionDetail.GameType}_{gameTransactionDetail.MachineType}",
-                ExternalCreatedOn: gameTransactionDetail.GameDate,
-                ExternalClosedOn: gameTransactionDetail.LastModifyTime,
-                Bet: (gameTransactionDetail.HasGamble == 0) ? -gameTransactionDetail.Bet : -gameTransactionDetail.GambleBet,
-                ValidBet: (gameTransactionDetail.HasGamble == 0) ? -gameTransactionDetail.Bet : -gameTransactionDetail.GambleBet,
-                PlayerWinLoss: gameTransactionDetail.PlayerWinLoss,
-                Turnover: (gameTransactionDetail.HasGamble == 0) ? -gameTransactionDetail.Bet : -gameTransactionDetail.GambleBet,
-                Settle: gameTransactionDetail.Settle,
-                AdditionalData: JsonSerializer.Serialize(gameTransactionDetail));
+            if (transaction is null)
+            {
+                continue;
+            }
+            yield return new GameDetailTransactionResp(
+                HistoryId: transaction["seqNo"]?.GetValue<long>() ?? transaction["historyId"]!.GetValue<long>(),
+                PlayerId: transaction["playerId"]!.ToString(),
+                GameType: transaction["gType"]!.GetValue<int>(),
+                MachineType: transaction["mtype"]!.GetValue<int>(),
+                GameDate: transaction["gameDate"]!.ToString().StringConvertToDatetime(),
+                Bet: -transaction["bet"]!.GetValue<decimal>(),
+                Win: transaction["win"]!.GetValue<decimal>(),
+                Total: transaction["total"]!.GetValue<decimal>(),
+                Currency: transaction["currency"]!.ToString(),
+                Jackpot: transaction["jackpot"]!.GetValue<decimal>(),
+                JackpotContribute: transaction["jackpotContribute"]!.GetValue<decimal>(),
+                Denom: transaction["denom"]!.GetValue<decimal>(),
+                LastModifyTime: transaction["lastModifyTime"]!.ToString().StringConvertToDatetime(),
+                PlayerIp: transaction["playerIp"]!.ToString(),
+                ClientType: transaction["clientType"]!.ToString(),
+                HasFreegame: transaction["hasFreegame"]!.GetValue<int>(),
+                HasGamble: transaction["hasGamble"]!.GetValue<int>(),
+                GambleBet: -transaction["gambleBet"]?.GetValue<decimal>() ?? 0.0m,
+                SystemTakeWin: transaction["systemTakeWin"]!.GetValue<int>(),
+                AdditionalData: transaction.ToJsonString());
         }
     }
 
@@ -452,7 +467,7 @@ internal class GameApiClient : IGameApiClient
         }
     }
 
-    public async ValueTask<TransactionResponse> WithdrawalAsync(
+    public async ValueTask<TransactionResp> WithdrawalAsync(
         Uri apiUrl,
         string domain,
         string aesKey,
@@ -509,11 +524,13 @@ internal class GameApiClient : IGameApiClient
             ? throw new Status_6010_Exception(amount)
             : !status.Equals("0000", StringComparison.OrdinalIgnoreCase)
             ? throw new GameProvisioningErrorException(status, errText ?? string.Empty)
-            : jsonNode.Deserialize<TransactionResponse>(_jsonSerializerOptions)!;
+            : new TransactionResp(
+                SerialNo: jsonNode["serialNo"]!.ToString(),
+                Resp: jsonNode.ToJsonString());
     }
 
     private async ValueTask<JsonNode> PostAsync(
-            Uri apiUrl,
+        Uri apiUrl,
         string domain,
         string encryptedData,
         string action,

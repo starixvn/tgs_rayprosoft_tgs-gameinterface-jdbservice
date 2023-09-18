@@ -6,15 +6,14 @@ using Microsoft.Extensions.Options;
 using NSubstitute;
 using RichardSzalay.MockHttp;
 
-namespace Tgs.GameInterface.JDBService.Core.UnitTest.GameApiClientUnitTest;
+namespace Tgs.GameInterface.JDBService.Core.UnitTest;
 
-[TestClass]
 public class CreatePlayerUnitTest
 {
-    [TestMethod]
+    [Fact]
     public async Task Normal_Process()
     {
-        var apiUrl = new Uri("http://api.jygrq.com");
+        var apiUrl = new Uri("http://localhost/");
         var domain = "ZF";
         var aesKey = "831057181dd07807";
         var aesIV = "193a3159afebee65";
@@ -75,10 +74,10 @@ public class CreatePlayerUnitTest
             ).ConfigureAwait(false);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task Player_Already_Exists()
     {
-        var apiUrl = new Uri("http://api.jygrq.com");
+        var apiUrl = new Uri("http://localhost/");
         var domain = "ZF";
         var aesKey = "831057181dd07807";
         var aesIV = "193a3159afebee65";
