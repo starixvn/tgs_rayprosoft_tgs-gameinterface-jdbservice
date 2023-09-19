@@ -329,4 +329,124 @@ public class SearchGameTransactionDetailsUnitTest
         Assert.Equal(0, results.ElementAt(0).SystemTakeWin);
         Assert.Equal(respond["data"]!.AsArray()!.ElementAt(0)!.ToJsonString(), results.ElementAt(0).AdditionalData);
     }
+
+    [Fact]
+    public async Task Freegame()
+    {
+        var apiUrl = new Uri("http://localhost/");
+        var domain = "ZF";
+        var aesKey = "831057181dd07807";
+        var aesIV = "193a3159afebee65";
+        var agent = "zf055gpi";
+        var startTime = DateTime.Parse("2023-09-19 11:30:00+08:00");
+        var endTime = DateTime.Parse("2023-09-19 11:40:00+08:00");
+
+        var gameInterfaceSetting = Options.Create(new GameInterfaceSettingOptions()
+        {
+            WithdrawalRetryCount = 1,
+            WithdrawalIntervalSeconds = 1
+        });
+        var fakeLog = NullLogger<GameApiClient>.Instance;
+        var fakeAesSystemClock = Substitute.For<ISystemClock>();
+        var fakeAesCryptography = Substitute.For<IAesCryptography>();
+
+        var currentTime = DateTimeOffset.UtcNow;
+
+        _ = fakeAesSystemClock.UtcNow.Returns(currentTime);
+
+        var timeZone = TimeZoneInfo.CreateCustomTimeZone(id: "eastern time", baseUtcOffset: TimeSpan.FromHours(-4), "eastern time", "eastern time");
+        var startTimeEastern = TimeZoneInfo.ConvertTime(startTime.ToUniversalTime(), timeZone);
+        var endTimeEastern = TimeZoneInfo.ConvertTime(endTime.ToUniversalTime(), timeZone);
+
+        var encryptedData = Guid.NewGuid().ToString("N");
+        var data = new
+        {
+            action = 29,
+            ts = currentTime.ToUnixTimeMilliseconds(),
+            parent = agent,
+            starttime = startTimeEastern.ToString("dd-MM-yyyy HH:mm:00"),
+            endtime = endTimeEastern.ToString("dd-MM-yyyy HH:mm:00")
+        };
+        var jsonString = JsonSerializer.Serialize(data);
+        _ = fakeAesCryptography.GetAesEncryptAsync(
+            Arg.Is(jsonString),
+            Arg.Is(aesKey),
+            Arg.Is(aesIV)).Returns(encryptedData);
+
+        var url = new Uri(apiUrl, "/apiRequest.do");
+        var respond = new JsonObject
+        {
+            ["status"] = "0000",
+            ["data"] = new JsonArray {
+                new JsonObject
+                {
+                    ["seqNo"]= 5250214464421,
+                    ["playerId"]= "4ugse0rsnufp",
+                    ["gType"]= 0,
+                    ["mtype"]= 15010,
+                    ["gameDate"]= "19-09-2023 23:38:01",
+                    ["bet"]= -0.5,
+                    ["win"]= 65.5,
+                    ["total"]= 65.0,
+                    ["currency"]= "RB",
+                    ["jackpot"]= 0.0,
+                    ["jackpotContribute"]=  -0.0025,
+                    ["denom"]= 0.01,
+                    ["lastModifyTime"]= "19-09-2023 23:38:01",
+                    ["playerIp"]= "114.33.41.237",
+                    ["clientType"]= "WEB",
+                    ["hasFreegame"]= 1,
+                    ["hasGamble"]= 0,
+                    ["gambleBet"]= 0.0,
+                    ["systemTakeWin"]= 0
+                }
+            }
+        };
+        var handler = new MockHttpMessageHandler();
+        _ = handler
+            .Expect(HttpMethod.Post, url.ToString())
+            .Respond(HttpStatusCode.OK, new StringContent(respond.ToJsonString()));
+
+        var fakeHttpClient = handler.ToHttpClient();
+
+        var client = new GameApiClient(
+            gameInterfaceSetting,
+            fakeLog,
+            fakeHttpClient,
+            fakeAesSystemClock,
+            fakeAesCryptography);
+
+        var results = await client
+             .SearchGameTransactionDetailsAsync(
+                apiUrl,
+                domain,
+                aesKey,
+                aesIV,
+                agent,
+                startTime,
+                endTime)
+             .ToArrayAsync()
+             .ConfigureAwait(false);
+
+        Assert.NotNull(results);
+        Assert.True(results.Any());
+        Assert.Equal(5250214464421, results.ElementAt(0).HistoryId);
+        Assert.Equal("4ugse0rsnufp", results.ElementAt(0).PlayerId);
+        Assert.Equal(DateTimeOffset.Parse("2023-09-19T23:38:01-04:00"), results.ElementAt(0).GameDate);
+        Assert.Equal(0.5m, results.ElementAt(0).Bet);
+        Assert.Equal(65.5m, results.ElementAt(0).Win);
+        Assert.Equal(65.0m, results.ElementAt(0).Total);
+        Assert.Equal("RB", results.ElementAt(0).Currency);
+        Assert.Equal(0.0m, results.ElementAt(0).Jackpot);
+        Assert.Equal(-0.0025m, results.ElementAt(0).JackpotContribute);
+        Assert.Equal(0.01m, results.ElementAt(0).Denom);
+        Assert.Equal(DateTimeOffset.Parse("2023-09-19T23:38:01-04:00"), results.ElementAt(0).LastModifyTime);
+        Assert.Equal("114.33.41.237", results.ElementAt(0).PlayerIp);
+        Assert.Equal("WEB", results.ElementAt(0).ClientType);
+        Assert.Equal(1, results.ElementAt(0).HasFreegame);
+        Assert.Equal(0, results.ElementAt(0).HasGamble);
+        Assert.Equal(0.0m, results.ElementAt(0).GambleBet);
+        Assert.Equal(0, results.ElementAt(0).SystemTakeWin);
+        Assert.Equal(respond["data"]!.AsArray()!.ElementAt(0)!.ToJsonString(), results.ElementAt(0).AdditionalData);
+    }
 }
