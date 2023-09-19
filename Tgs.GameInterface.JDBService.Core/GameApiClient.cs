@@ -231,7 +231,7 @@ internal class GameApiClient : IGameApiClient
                 continue;
             }
             yield return new GameDetailTransactionResp(
-                HistoryId: transaction["seqNo"]?.GetValue<long>() ?? transaction["historyId"]!.GetValue<long>(),
+                HistoryId: transaction["historyId"]?.GetValue<long>() ?? transaction["seqNo"]!.GetValue<long>(),
                 PlayerId: transaction["playerId"]!.ToString(),
                 GameType: transaction["gType"]!.GetValue<int>(),
                 MachineType: transaction["mtype"]!.GetValue<int>(),
@@ -310,7 +310,7 @@ internal class GameApiClient : IGameApiClient
                 continue;
             }
             yield return new GameDetailTransactionResp(
-                HistoryId: transaction["seqNo"]?.GetValue<long>() ?? transaction["historyId"]!.GetValue<long>(),
+                HistoryId: transaction["historyId"]?.GetValue<long>() ?? transaction["seqNo"]!.GetValue<long>(),
                 PlayerId: transaction["playerId"]!.ToString(),
                 GameType: transaction["gType"]!.GetValue<int>(),
                 MachineType: transaction["mtype"]!.GetValue<int>(),
