@@ -25,7 +25,7 @@ public class GameWagerQueryServiceUnitTest
         var resp = new GameDetailTransactionResp[]
             {
                 new GameDetailTransactionResp(
-                HistoryId: sysUtcNow.ToUnixTimeMilliseconds(),
+                HistoryId: sysUtcNow.ToUnixTimeMilliseconds().ToString(),
                 PlayerId:"test",
                 GameType:1,
                 MachineType:0,
@@ -102,7 +102,7 @@ public class GameWagerQueryServiceUnitTest
         var resp = new GameDetailTransactionResp[]
             {
                 new GameDetailTransactionResp(
-                HistoryId: sysUtcNow.ToUnixTimeMilliseconds(),
+                HistoryId: sysUtcNow.ToUnixTimeMilliseconds().ToString(),
                 PlayerId:"4ugse0rsnufp",
                 GameType:0,
                 MachineType:15010,

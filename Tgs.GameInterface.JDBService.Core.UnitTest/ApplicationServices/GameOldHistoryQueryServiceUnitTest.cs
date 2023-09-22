@@ -25,7 +25,7 @@ public class GameOldHistoryQueryServiceUnitTest
         var resp = new GameDetailTransactionResp[]
             {
                 new GameDetailTransactionResp(
-                HistoryId: sysUtcNow.ToUnixTimeMilliseconds(),
+                HistoryId: sysUtcNow.ToUnixTimeMilliseconds().ToString(),
                 PlayerId:"test",
                 GameType:1,
                 MachineType:0,

@@ -1,7 +1,7 @@
 ﻿namespace Tgs.GameInterface.JDBService.Core.Models;
 
 public record GameDetailTransactionResp(
-    long HistoryId,
+    string HistoryId,
     string PlayerId,
     int GameType,
     int MachineType,
