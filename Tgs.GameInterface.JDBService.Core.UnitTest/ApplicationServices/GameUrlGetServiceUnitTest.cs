@@ -36,10 +36,7 @@ public class GameUrlGetServiceUnitTest
         var service = new GameUrlGetService(
             fakeClient);
 
-        var actual = await service
-            .GetAsync(
-            query: query)
-            .ConfigureAwait(false);
+        var actual = await service.GetAsync(query: query);
 
         Assert.True(actual.IsPlayerExist);
         Assert.Equal("http://localhost/", actual.GameUrl);

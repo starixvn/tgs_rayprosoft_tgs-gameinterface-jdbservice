@@ -21,10 +21,7 @@ public class PlayerCreateCommandServiceUnitTest
         var service = new PlayerCreateCommandService(
             fakeClient);
 
-        await service
-            .ExecuteAsync(
-            command: command)
-            .ConfigureAwait(false);
+        await service.ExecuteAsync(command: command);
 
         _ = fakeClient
             .Received(1)

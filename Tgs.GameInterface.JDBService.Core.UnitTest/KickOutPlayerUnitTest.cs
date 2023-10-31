@@ -63,14 +63,12 @@ public class KickOutPlayerUnitTest
             fakeAesSystemClock,
             fakeAesCryptography);
 
-        await client
-            .KickOutPlayerAsync(
-               apiUrl,
-               domain,
-               aesKey,
-               aesIV,
-               agent,
-               playerCode)
-            .ConfigureAwait(false);
+        await client.KickOutPlayerAsync(
+            apiUrl: apiUrl,
+            domain: domain,
+            aesKey: aesKey,
+            aesIV: aesIV,
+            agent: agent,
+            playerCode: playerCode);
     }
 }

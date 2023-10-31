@@ -79,17 +79,15 @@ public class WithdrawalUnitTest
             fakeAesSystemClock,
             fakeAesCryptography);
 
-        var actual = await client
-             .WithdrawalAsync(
-                apiUrl,
-                domain,
-                aesKey,
-                aesIV,
-                agent,
-                playerCode,
-                serialNo,
-                amount)
-             .ConfigureAwait(false);
+        var actual = await client.WithdrawalAsync(
+            apiUrl: apiUrl,
+            domain: domain,
+            aesKey: aesKey,
+            aesIV: aesIV,
+            agent: agent,
+            playerCode: playerCode,
+            serialNo: serialNo,
+            amount: amount);
 
         Assert.NotNull(actual);
         Assert.Equal("1662452479", actual.SerialNo);
@@ -158,17 +156,16 @@ public class WithdrawalUnitTest
             fakeAesSystemClock,
             fakeAesCryptography);
 
-        _ = await Assert.ThrowsAsync<Status_6009_Exception>(async () => await client
-              .WithdrawalAsync(
-                 apiUrl,
-                 domain,
-                 aesKey,
-                 aesIV,
-                 agent,
-                 playerCode,
-                 serialNo,
-                 amount)
-              .ConfigureAwait(false));
+        _ = await Assert.ThrowsAsync<Status_6009_Exception>(
+            async () => await client.WithdrawalAsync(
+                apiUrl: apiUrl,
+                domain: domain,
+                aesKey: aesKey,
+                aesIV: aesIV,
+                agent: agent,
+                playerCode: playerCode,
+                serialNo: serialNo,
+                amount: amount));
     }
 
     [Fact]
@@ -233,17 +230,16 @@ public class WithdrawalUnitTest
             fakeAesSystemClock,
             fakeAesCryptography);
 
-        _ = await Assert.ThrowsAsync<Status_6010_Exception>(async () => await client
-              .WithdrawalAsync(
-                 apiUrl,
-                 domain,
-                 aesKey,
-                 aesIV,
-                 agent,
-                 playerCode,
-                 serialNo,
-                 amount)
-              .ConfigureAwait(false));
+        _ = await Assert.ThrowsAsync<Status_6010_Exception>(
+            async () => await client.WithdrawalAsync(
+                apiUrl: apiUrl,
+                domain: domain,
+                aesKey: aesKey,
+                aesIV: aesIV,
+                agent: agent,
+                playerCode: playerCode,
+                serialNo: serialNo,
+                amount: amount));
     }
 
     [Fact]
@@ -308,16 +304,15 @@ public class WithdrawalUnitTest
             fakeAesSystemClock,
             fakeAesCryptography);
 
-        _ = await Assert.ThrowsAsync<HttpRequestException>(async () => await client
-              .WithdrawalAsync(
-                 apiUrl,
-                 domain,
-                 aesKey,
-                 aesIV,
-                 agent,
-                 playerCode,
-                 serialNo,
-                 amount)
-              .ConfigureAwait(false));
+        _ = await Assert.ThrowsAsync<HttpRequestException>(
+            async () => await client.WithdrawalAsync(
+                apiUrl: apiUrl,
+                domain: domain,
+                aesKey: aesKey,
+                aesIV: aesIV,
+                agent: agent,
+                playerCode: playerCode,
+                serialNo: serialNo,
+                amount: amount));
     }
 }

@@ -71,15 +71,14 @@ public class GetTokenUnitTest
             fakeAesCryptography);
 
         var (IsPlayerExist, GameUrl) = await client.GetTokenAsync(
-                apiUrl,
-                domain,
-                aesKey,
-                aesIV,
-                playerCode,
-                gameType,
-                machineType,
-                lang
-             ).ConfigureAwait(false);
+            apiUrl: apiUrl,
+            domain: domain,
+            aesKey: aesKey,
+            aesIV: aesIV,
+            playerCode: playerCode,
+            gameType: gameType,
+            machineType: machineType,
+            lang: lang);
 
         Assert.True(IsPlayerExist);
         Assert.Equal("https://localhost/", GameUrl);
@@ -144,16 +143,16 @@ public class GetTokenUnitTest
             fakeHttpClient,
             fakeAesSystemClock,
             fakeAesCryptography);
+
         var (IsPlayerExist, _) = await client.GetTokenAsync(
-                apiUrl,
-                domain,
-                aesKey,
-                aesIV,
-                playerCode,
-                gameType,
-                machineType,
-                lang
-             ).ConfigureAwait(false);
+            apiUrl: apiUrl,
+            domain: domain,
+            aesKey: aesKey,
+            aesIV: aesIV,
+            playerCode: playerCode,
+            gameType: gameType,
+            machineType: machineType,
+            lang: lang);
 
         Assert.False(IsPlayerExist);
     }

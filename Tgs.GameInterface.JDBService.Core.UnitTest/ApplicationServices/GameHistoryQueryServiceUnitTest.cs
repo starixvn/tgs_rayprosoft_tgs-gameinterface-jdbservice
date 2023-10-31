@@ -64,11 +64,9 @@ public class GameHistoryQueryServiceUnitTest
         var service = new GameHistoryQueryService(
             fakeClient);
 
-        var actual = await service
-            .QueryAsync(
+        var actual = await service.QueryAsync(
             query: query)
             .ToArrayAsync()
-            .ConfigureAwait(false)
             ?? Enumerable.Empty<GameHistoryResult>();
 
         Assert.Equal(resp.ToArray().ElementAt(0).PlayerId, actual.ElementAt(0).PlayerCode);

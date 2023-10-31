@@ -63,15 +63,13 @@ public class CheckCashTransferUnitTest
             fakeAesSystemClock,
             fakeAesCryptography);
 
-        var actual = await client
-             .CheckCashTransferAsync(
-                apiUrl,
-                domain,
-                aesKey,
-                aesIV,
-                agent,
-                serialNo)
-             .ConfigureAwait(false);
+        var actual = await client.CheckCashTransferAsync(
+            apiUrl: apiUrl,
+            domain: domain,
+            aesKey: aesKey,
+            aesIV: aesIV,
+            agent: agent,
+            serialNo: serialNo);
 
         Assert.True(actual);
     }
@@ -129,15 +127,13 @@ public class CheckCashTransferUnitTest
             fakeAesSystemClock,
             fakeAesCryptography);
 
-        var actual = await client
-             .CheckCashTransferAsync(
-                apiUrl,
-                domain,
-                aesKey,
-                aesIV,
-                agent,
-                serialNo)
-             .ConfigureAwait(false);
+        var actual = await client.CheckCashTransferAsync(
+            apiUrl: apiUrl,
+            domain: domain,
+            aesKey: aesKey,
+            aesIV: aesIV,
+            agent: agent,
+            serialNo: serialNo);
 
         Assert.False(actual);
     }

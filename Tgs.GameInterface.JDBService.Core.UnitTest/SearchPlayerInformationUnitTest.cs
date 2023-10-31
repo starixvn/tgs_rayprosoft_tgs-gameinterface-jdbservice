@@ -64,13 +64,12 @@ public class SearchPlayerInformationUnitTest
             fakeAesCryptography);
 
         var (IsPlayerExist, Balance) = await client.SearchPlayerInformationAsync(
-                apiUrl,
-                domain,
-                aesKey,
-                aesIV,
-                agent,
-                playerCode
-             ).ConfigureAwait(false);
+            apiUrl: apiUrl,
+            domain: domain,
+            aesKey: aesKey,
+            aesIV: aesIV,
+            agent: agent,
+            playerCode: playerCode);
 
         Assert.True(IsPlayerExist);
         Assert.Equal(1m, Balance);
@@ -128,14 +127,14 @@ public class SearchPlayerInformationUnitTest
             fakeHttpClient,
             fakeAesSystemClock,
             fakeAesCryptography);
+
         var (IsPlayerExist, _) = await client.SearchPlayerInformationAsync(
-                apiUrl,
-                domain,
-                aesKey,
-                aesIV,
-                agent,
-                playerCode
-             ).ConfigureAwait(false);
+            apiUrl: apiUrl,
+            domain: domain,
+            aesKey: aesKey,
+            aesIV: aesIV,
+            agent: agent,
+            playerCode: playerCode);
 
         Assert.False(IsPlayerExist);
     }

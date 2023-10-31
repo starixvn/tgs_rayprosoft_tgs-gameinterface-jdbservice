@@ -32,10 +32,7 @@ public class FundStatusGetServiceUnitTest
         var service = new FundStatusGetService(
             fakeClient);
 
-        var actual = await service
-            .GetAsync(
-            query: query)
-            .ConfigureAwait(false);
+        var actual = await service.GetAsync(query: query);
 
         Assert.True(actual);
     }

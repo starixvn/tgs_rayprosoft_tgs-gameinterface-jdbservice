@@ -65,13 +65,12 @@ public class CreatePlayerUnitTest
             fakeAesCryptography);
 
         await client.CreatePlayerAsync(
-               apiUrl,
-               domain,
-               aesKey,
-               aesIV,
-               agent,
-               playerCode
-            ).ConfigureAwait(false);
+            apiUrl: apiUrl,
+            domain: domain,
+            aesKey: aesKey,
+            aesIV: aesIV,
+            agent: agent,
+            playerCode: playerCode);
     }
 
     [Fact]
@@ -129,12 +128,11 @@ public class CreatePlayerUnitTest
             fakeAesCryptography);
 
         await client.CreatePlayerAsync(
-               apiUrl,
-               domain,
-               aesKey,
-               aesIV,
-               agent,
-               playerCode
-            ).ConfigureAwait(false); ;
+            apiUrl: apiUrl,
+            domain: domain,
+            aesKey: aesKey,
+            aesIV: aesIV,
+            agent: agent,
+            playerCode: playerCode);
     }
 }

@@ -97,17 +97,15 @@ public class SearchGameTransactionDetailsUnitTest
             fakeAesSystemClock,
             fakeAesCryptography);
 
-        var results = await client
-             .SearchGameTransactionDetailsAsync(
-                apiUrl,
-                domain,
-                aesKey,
-                aesIV,
-                agent,
-                startTime,
-                endTime)
-             .ToArrayAsync()
-             .ConfigureAwait(false);
+        var results = await client.SearchGameTransactionDetailsAsync(
+            apiUrl: apiUrl,
+            domain: domain,
+            aesKey: aesKey,
+            aesIV: aesIV,
+            agent: agent,
+            startTime: startTime,
+            endTime: endTime)
+            .ToArrayAsync();
 
         Assert.NotNull(results);
         Assert.True(results.Any());
@@ -194,17 +192,15 @@ public class SearchGameTransactionDetailsUnitTest
             fakeAesSystemClock,
             fakeAesCryptography);
 
-        var results = await client
-             .SearchGameTransactionDetailsAsync(
-                apiUrl,
-                domain,
-                aesKey,
-                aesIV,
-                agent,
-                startTime,
-                endTime)
-             .ToArrayAsync()
-             .ConfigureAwait(false);
+        var results = await client.SearchGameTransactionDetailsAsync(
+            apiUrl: apiUrl,
+            domain: domain,
+            aesKey: aesKey,
+            aesIV: aesIV,
+            agent: agent,
+            startTime: startTime,
+            endTime: endTime)
+            .ToArrayAsync();
 
         Assert.NotNull(results);
         Assert.False(results.Any());
@@ -297,17 +293,15 @@ public class SearchGameTransactionDetailsUnitTest
             fakeAesSystemClock,
             fakeAesCryptography);
 
-        var results = await client
-             .SearchGameTransactionDetailsAsync(
-                apiUrl,
-                domain,
-                aesKey,
-                aesIV,
-                agent,
-                startTime,
-                endTime)
-             .ToArrayAsync()
-             .ConfigureAwait(false);
+        var results = await client.SearchGameTransactionDetailsAsync(
+            apiUrl: apiUrl,
+            domain: domain,
+            aesKey: aesKey,
+            aesIV: aesIV,
+            agent: agent,
+            startTime: startTime,
+            endTime: endTime)
+            .ToArrayAsync();
 
         Assert.NotNull(results);
         Assert.True(results.Any());
@@ -417,17 +411,15 @@ public class SearchGameTransactionDetailsUnitTest
             fakeAesSystemClock,
             fakeAesCryptography);
 
-        var results = await client
-             .SearchGameTransactionDetailsAsync(
-                apiUrl,
-                domain,
-                aesKey,
-                aesIV,
-                agent,
-                startTime,
-                endTime)
-             .ToArrayAsync()
-             .ConfigureAwait(false);
+        var results = await client.SearchGameTransactionDetailsAsync(
+            apiUrl: apiUrl,
+            domain: domain,
+            aesKey: aesKey,
+            aesIV: aesIV,
+            agent: agent,
+            startTime: startTime,
+            endTime: endTime)
+            .ToArrayAsync();
 
         Assert.NotNull(results);
         Assert.True(results.Any());
@@ -534,17 +526,15 @@ public class SearchGameTransactionDetailsUnitTest
             fakeAesSystemClock,
             fakeAesCryptography);
 
-        var results = await client
-             .SearchGameTransactionDetailsAsync(
-                apiUrl,
-                domain,
-                aesKey,
-                aesIV,
-                agent,
-                startTime,
-                endTime)
-             .ToArrayAsync()
-             .ConfigureAwait(false);
+        var results = await client.SearchGameTransactionDetailsAsync(
+            apiUrl: apiUrl,
+            domain: domain,
+            aesKey: aesKey,
+            aesIV: aesIV,
+            agent: agent,
+            startTime: startTime,
+            endTime: endTime)
+            .ToArrayAsync();
 
         Assert.NotNull(results);
         Assert.True(results.Any());
@@ -652,17 +642,15 @@ public class SearchGameTransactionDetailsUnitTest
             fakeAesSystemClock,
             fakeAesCryptography);
 
-        var results = await client
-             .SearchGameTransactionDetailsAsync(
-                apiUrl,
-                domain,
-                aesKey,
-                aesIV,
-                agent,
-                startTime,
-                endTime)
-             .ToArrayAsync()
-             .ConfigureAwait(false);
+        var results = await client.SearchGameTransactionDetailsAsync(
+            apiUrl: apiUrl,
+            domain: domain,
+            aesKey: aesKey,
+            aesIV: aesIV,
+            agent: agent,
+            startTime: startTime,
+            endTime: endTime)
+            .ToArrayAsync();
 
         Assert.NotNull(results);
         Assert.True(results.Any());

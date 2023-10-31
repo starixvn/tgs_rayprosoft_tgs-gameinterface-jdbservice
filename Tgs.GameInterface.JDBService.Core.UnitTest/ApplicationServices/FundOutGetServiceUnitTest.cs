@@ -43,10 +43,7 @@ public class FundOutGetServiceUnitTest
         var service = new FundOutGetService(
             fakeClient);
 
-        var actual = await service
-            .GetAsync(
-            query: query)
-            .ConfigureAwait(false);
+        var actual = await service.GetAsync(query: query);
 
         Assert.Equal(query.SerialNo, actual.SerialNo);
     }

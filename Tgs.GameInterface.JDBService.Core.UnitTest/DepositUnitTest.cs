@@ -79,17 +79,15 @@ public class DepositUnitTest
             fakeAesSystemClock,
             fakeAesCryptography);
 
-        var actual = await client
-             .DepositAsync(
-                apiUrl,
-                domain,
-                aesKey,
-                aesIV,
-                agent,
-                playerCode,
-                serialNo,
-                amount)
-             .ConfigureAwait(false);
+        var actual = await client.DepositAsync(
+            apiUrl: apiUrl,
+            domain: domain,
+            aesKey: aesKey,
+            aesIV: aesIV,
+            agent: agent,
+            playerCode: playerCode,
+            serialNo: serialNo,
+            amount: amount);
 
         Assert.NotNull(actual);
         Assert.Equal("1662442853", actual.SerialNo);
@@ -158,17 +156,16 @@ public class DepositUnitTest
             fakeAesSystemClock,
             fakeAesCryptography);
 
-        _ = await Assert.ThrowsAsync<Status_6009_Exception>(async () => await client
-              .DepositAsync(
-                 apiUrl,
-                 domain,
-                 aesKey,
-                 aesIV,
-                 agent,
-                 playerCode,
-                 serialNo,
-                 amount)
-              .ConfigureAwait(false));
+        _ = await Assert.ThrowsAsync<Status_6009_Exception>(
+            async () => await client.DepositAsync(
+                apiUrl: apiUrl,
+                domain: domain,
+                aesKey: aesKey,
+                aesIV: aesIV,
+                agent: agent,
+                playerCode: playerCode,
+                serialNo: serialNo,
+                amount: amount));
     }
 
     [Fact]
@@ -233,16 +230,15 @@ public class DepositUnitTest
             fakeAesSystemClock,
             fakeAesCryptography);
 
-        _ = await Assert.ThrowsAsync<Status_6010_Exception>(async () => await client
-              .DepositAsync(
-                 apiUrl,
-                 domain,
-                 aesKey,
-                 aesIV,
-                 agent,
-                 playerCode,
-                 serialNo,
-                 amount)
-              .ConfigureAwait(false));
+        _ = await Assert.ThrowsAsync<Status_6010_Exception>(
+            async () => await client.DepositAsync(
+                apiUrl: apiUrl,
+                domain: domain,
+                aesKey: aesKey,
+                aesIV: aesIV,
+                agent: agent,
+                playerCode: playerCode,
+                serialNo: serialNo,
+                amount: amount));
     }
 }

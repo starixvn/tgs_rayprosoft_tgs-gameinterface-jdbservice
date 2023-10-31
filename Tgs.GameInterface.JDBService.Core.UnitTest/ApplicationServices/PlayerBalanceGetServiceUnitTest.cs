@@ -32,10 +32,7 @@ public class PlayerBalanceGetServiceUnitTest
         var service = new PlayerBalanceGetService(
             fakeClient);
 
-        var actual = await service
-            .GetAsync(
-            query: query)
-            .ConfigureAwait(false);
+        var actual = await service.GetAsync(query: query);
 
         Assert.True(actual.IsPlayerExist);
         Assert.Equal(1.0m, actual.Balance);
