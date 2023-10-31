@@ -304,7 +304,7 @@ public class WithdrawalUnitTest
             fakeAesSystemClock,
             fakeAesCryptography);
 
-        _ = await Assert.ThrowsAsync<HttpRequestException>(
+        _ = await Assert.ThrowsAsync<MockHttpMatchException>(
             async () => await client.WithdrawalAsync(
                 apiUrl: apiUrl,
                 domain: domain,
