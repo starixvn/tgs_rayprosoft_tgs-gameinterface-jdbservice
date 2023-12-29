@@ -1,8 +1,5 @@
 ﻿namespace Tgs.GameInterface.JDBService.Core.Exceptions;
 
-public class GameProvisioningErrorException : Exception
+public class GameProvisioningErrorException(string status, string errText) : Exception($"Game Provisioning Error Messages.(status:{status} | err_text:{errText})")
 {
-    public GameProvisioningErrorException(string status, string errText) : base($"Game Provisioning Error Messages.(status:{status} | err_text:{errText})")
-    {
-    }
 }

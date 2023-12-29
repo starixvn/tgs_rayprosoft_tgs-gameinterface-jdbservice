@@ -231,7 +231,7 @@ public class JDBController : ControllerBase
                  .ToArrayAsync()
                  .ConfigureAwait(false);
 
-        if (!results.Any())
+        if (results.Length == 0)
         {
             yield break;
         }
@@ -295,7 +295,7 @@ public class JDBController : ControllerBase
             .ToArrayAsync()
             .ConfigureAwait(false);
 
-        if (!results.Any())
+        if (results.Length == 0)
         {
             yield break;
         }
@@ -359,7 +359,7 @@ public class JDBController : ControllerBase
                  .ToArrayAsync()
                  .ConfigureAwait(false);
 
-        if (!results.Any())
+        if (results.Length == 0)
         {
             yield break;
         }
@@ -423,7 +423,7 @@ public class JDBController : ControllerBase
             .ToArrayAsync()
             .ConfigureAwait(false);
 
-        if (!results.Any())
+        if (results.Length == 0)
         {
             yield break;
         }

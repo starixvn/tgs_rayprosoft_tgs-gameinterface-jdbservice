@@ -24,7 +24,7 @@ public class GameHistoryQueryServiceUnitTest
         var sysUtcNow = DateTimeOffset.UtcNow;
         var resp = new GameDetailTransactionResp[]
             {
-                new GameDetailTransactionResp(
+                new(
                 HistoryId: sysUtcNow.ToUnixTimeMilliseconds().ToString(),
                 PlayerId:"test",
                 GameType:1,

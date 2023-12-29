@@ -219,7 +219,7 @@ internal class GameApiClient : IGameApiClient
 
         var transactions = jsonNode["data"]!.AsArray();
 
-        if (!transactions.Any())
+        if (transactions.Count == 0)
         {
             yield break;
         }
@@ -298,7 +298,7 @@ internal class GameApiClient : IGameApiClient
 
         var transactions = jsonNode["data"]!.AsArray();
 
-        if (!transactions.Any())
+        if (transactions.Count == 0)
         {
             yield break;
         }

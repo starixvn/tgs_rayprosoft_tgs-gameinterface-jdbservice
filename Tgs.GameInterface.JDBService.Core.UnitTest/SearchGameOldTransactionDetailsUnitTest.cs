@@ -109,7 +109,7 @@ public class SearchGameOldTransactionDetailsUnitTest
             .ToArrayAsync();
 
         Assert.NotNull(results);
-        Assert.True(results.Any());
+        Assert.NotEmpty(results);
         Assert.Equal("7383541906849", results.ElementAt(0).HistoryId);
         Assert.Equal("4uhm33dvljda", results.ElementAt(0).PlayerId);
         Assert.Equal(DateTimeOffset.Parse("2023-09-18T01:38:40-04:00"), results.ElementAt(0).GameDate);
@@ -205,7 +205,7 @@ public class SearchGameOldTransactionDetailsUnitTest
             .ToArrayAsync();
 
         Assert.NotNull(results);
-        Assert.False(results.Any());
+        Assert.Empty(results);
     }
 
     [Fact]
@@ -306,7 +306,7 @@ public class SearchGameOldTransactionDetailsUnitTest
             .ToArrayAsync();
 
         Assert.NotNull(results);
-        Assert.True(results.Any());
+        Assert.NotEmpty(results);
         Assert.Equal("7383541906849", results.ElementAt(0).HistoryId);
         Assert.Equal("4uhm33dvljda", results.ElementAt(0).PlayerId);
         Assert.Equal(DateTimeOffset.Parse("2023-09-18T01:38:40-04:00"), results.ElementAt(0).GameDate);
@@ -422,7 +422,7 @@ public class SearchGameOldTransactionDetailsUnitTest
             .ToArrayAsync();
 
         Assert.NotNull(results);
-        Assert.True(results.Any());
+        Assert.NotEmpty(results);
         Assert.Equal("7383794539225", results.ElementAt(0).HistoryId);
         Assert.Equal("4uk1wq8nszhn", results.ElementAt(0).PlayerId);
         Assert.Equal(DateTimeOffset.Parse("2023-09-20T11:49:00-04:00"), results.ElementAt(0).GameDate);
@@ -539,7 +539,7 @@ public class SearchGameOldTransactionDetailsUnitTest
             .ToArrayAsync();
 
         Assert.NotNull(results);
-        Assert.True(results.Any());
+        Assert.NotEmpty(results);
         Assert.Equal("5250214475720", results.ElementAt(0).HistoryId);
         Assert.Equal("4ufhtneqo2ia", results.ElementAt(0).PlayerId);
         Assert.Equal(DateTimeOffset.Parse("2023-09-22T03:39:04-04:00"), results.ElementAt(0).GameDate);

@@ -7,53 +7,23 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.GameInterface.JDBService.GrpcServices;
 
-public class GameInterfaceJDBGrpcService : GameInterfaceJDBService.GameInterfaceJDBServiceBase
+public class GameInterfaceJDBGrpcService(
+    ILogger<GameInterfaceJDBGrpcService> logger,
+    IGetService<PlayerBalanceQuery, PlayerBalanceResult> playerBalanceService,
+    ICommandService<PlayerCreateCommand> PlayerCreateService,
+    ICommandService<PlayerKickCommand> playerKickService,
+    IGetService<FundInQuery, FundResult> fundInService,
+    IGetService<FundOutQuery, FundResult> fundOutService,
+    IGetService<FundStatusQuery, bool> fundStatusService,
+    IGetService<GameUrlQuery, GameUrlResult> gameUrlService,
+    IQueryService<GameHistoryQuery, GameHistoryResult> gameHistoryService,
+    IQueryService<GameOldHistoryQuery, GameHistoryResult> gameOldHistoryService,
+    IQueryService<GameWagerQuery, GameWagerResult> gameWagerService,
+    IQueryService<GameWagerOldQuery, GameWagerResult> gameWagerOldService) : GameInterfaceJDBService.GameInterfaceJDBServiceBase
 {
-    private readonly ILogger<GameInterfaceJDBGrpcService> _logger;
-    private readonly IGetService<PlayerBalanceQuery, PlayerBalanceResult> _playerBalanceService;
-    private readonly ICommandService<PlayerCreateCommand> _playerCreateService;
-    private readonly ICommandService<PlayerKickCommand> _playerKickService;
-    private readonly IGetService<FundInQuery, FundResult> _fundInService;
-    private readonly IGetService<FundOutQuery, FundResult> _fundOutService;
-    private readonly IGetService<FundStatusQuery, bool> _fundStatusService;
-    private readonly IGetService<GameUrlQuery, GameUrlResult> _gameUrlService;
-    private readonly IQueryService<GameHistoryQuery, GameHistoryResult> _gameHistoryService;
-    private readonly IQueryService<GameOldHistoryQuery, GameHistoryResult> _gameOldHistoryService;
-    private readonly IQueryService<GameWagerQuery, GameWagerResult> _gameWagerService;
-    private readonly IQueryService<GameWagerOldQuery, GameWagerResult> _gameWagerOldService;
-
-    public GameInterfaceJDBGrpcService(
-        ILogger<GameInterfaceJDBGrpcService> logger,
-        IGetService<PlayerBalanceQuery, PlayerBalanceResult> playerBalanceService,
-        ICommandService<PlayerCreateCommand> PlayerCreateService,
-        ICommandService<PlayerKickCommand> playerKickService,
-        IGetService<FundInQuery, FundResult> fundInService,
-        IGetService<FundOutQuery, FundResult> fundOutService,
-        IGetService<FundStatusQuery, bool> fundStatusService,
-        IGetService<GameUrlQuery, GameUrlResult> gameUrlService,
-        IQueryService<GameHistoryQuery, GameHistoryResult> gameHistoryService,
-        IQueryService<GameOldHistoryQuery, GameHistoryResult> gameOldHistoryService,
-        IQueryService<GameWagerQuery, GameWagerResult> gameWagerService,
-        IQueryService<GameWagerOldQuery, GameWagerResult> gameWagerOldService
-        )
-    {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _playerBalanceService = playerBalanceService ?? throw new ArgumentNullException(nameof(playerBalanceService));
-        _playerCreateService = PlayerCreateService ?? throw new ArgumentNullException(nameof(PlayerCreateService));
-        _playerKickService = playerKickService ?? throw new ArgumentNullException(nameof(playerKickService));
-        _fundInService = fundInService ?? throw new ArgumentNullException(nameof(fundInService));
-        _fundOutService = fundOutService ?? throw new ArgumentNullException(nameof(fundOutService));
-        _fundStatusService = fundStatusService ?? throw new ArgumentNullException(nameof(fundStatusService));
-        _gameUrlService = gameUrlService ?? throw new ArgumentNullException(nameof(gameUrlService));
-        _gameHistoryService = gameHistoryService ?? throw new ArgumentNullException(nameof(gameHistoryService));
-        _gameOldHistoryService = gameOldHistoryService ?? throw new ArgumentNullException(nameof(gameOldHistoryService));
-        _gameWagerService = gameWagerService ?? throw new ArgumentNullException(nameof(gameWagerService));
-        _gameWagerOldService = gameWagerOldService ?? throw new ArgumentNullException(nameof(gameWagerOldService));
-    }
-
     public override Task<CheckingServiceReply> CheckingService(CheckingServiceRequest request, ServerCallContext context)
     {
-        _logger.LogWarning("LogOn:{logOn} Message: Create a check connection.({machineName})", DateTime.Now.ToString("o"), request.MachineName);
+        logger.LogWarning("LogOn:{logOn} Message: Create a check connection.({machineName})", DateTime.Now.ToString("o"), request.MachineName);
 
         return Task.FromResult(new CheckingServiceReply
         {
@@ -73,7 +43,7 @@ public class GameInterfaceJDBGrpcService : GameInterfaceJDBService.GameInterface
         request.SerialNo,
         request.Amount);
 
-        var result = await _fundInService
+        var result = await fundInService
             .GetAsync(
                 query: query,
                 cancellationToken: context.CancellationToken)
@@ -98,7 +68,7 @@ public class GameInterfaceJDBGrpcService : GameInterfaceJDBService.GameInterface
         request.SerialNo,
         request.Amount);
 
-        var result = await _fundOutService
+        var result = await fundOutService
             .GetAsync(
                 query: query,
                 cancellationToken: context.CancellationToken)
@@ -121,7 +91,7 @@ public class GameInterfaceJDBGrpcService : GameInterfaceJDBService.GameInterface
         request.Agent,
         request.SerialNo);
 
-        var result = await _fundStatusService
+        var result = await fundStatusService
             .GetAsync(
                 query: query,
                 cancellationToken: context.CancellationToken)
@@ -144,7 +114,7 @@ public class GameInterfaceJDBGrpcService : GameInterfaceJDBService.GameInterface
         request.StartTime.ToDateTime(),
         request.EndTime.ToDateTime());
 
-        var results = await _gameHistoryService
+        var results = await gameHistoryService
             .QueryAsync(
             query: query,
             cancellationToken: context.CancellationToken)
@@ -189,7 +159,7 @@ public class GameInterfaceJDBGrpcService : GameInterfaceJDBService.GameInterface
         request.StartTime.ToDateTime(),
         request.EndTime.ToDateTime());
 
-        var results = await _gameOldHistoryService
+        var results = await gameOldHistoryService
             .QueryAsync(
             query: query,
             cancellationToken: context.CancellationToken)
@@ -235,7 +205,7 @@ public class GameInterfaceJDBGrpcService : GameInterfaceJDBService.GameInterface
         request.MachineType,
         request.Lang);
 
-        var result = await _gameUrlService
+        var result = await gameUrlService
             .GetAsync(
                 query: query,
                 cancellationToken: context.CancellationToken)
@@ -259,7 +229,7 @@ public class GameInterfaceJDBGrpcService : GameInterfaceJDBService.GameInterface
         request.StartTime.ToDateTime(),
         request.EndTime.ToDateTime());
 
-        var results = await _gameWagerService
+        var results = await gameWagerService
             .QueryAsync(
             query: query,
             cancellationToken: context.CancellationToken)
@@ -304,7 +274,7 @@ public class GameInterfaceJDBGrpcService : GameInterfaceJDBService.GameInterface
         request.StartTime.ToDateTime(),
         request.EndTime.ToDateTime());
 
-        var results = await _gameWagerOldService
+        var results = await gameWagerOldService
             .QueryAsync(
             query: query,
             cancellationToken: context.CancellationToken)
@@ -348,7 +318,7 @@ public class GameInterfaceJDBGrpcService : GameInterfaceJDBService.GameInterface
         request.Agent,
         request.PlayerCode);
 
-        var result = await _playerBalanceService
+        var result = await playerBalanceService
             .GetAsync(
                 query: query,
                 cancellationToken: context.CancellationToken)
@@ -371,7 +341,7 @@ public class GameInterfaceJDBGrpcService : GameInterfaceJDBService.GameInterface
         request.Agent,
         request.PlayerCode);
 
-        await _playerCreateService
+        await PlayerCreateService
             .ExecuteAsync(
                 command: command,
                 cancellationToken: context.CancellationToken)
@@ -393,7 +363,7 @@ public class GameInterfaceJDBGrpcService : GameInterfaceJDBService.GameInterface
         request.Agent,
         request.PlayerCode);
 
-        await _playerKickService
+        await playerKickService
             .ExecuteAsync(
                 command: command,
                 cancellationToken: context.CancellationToken)

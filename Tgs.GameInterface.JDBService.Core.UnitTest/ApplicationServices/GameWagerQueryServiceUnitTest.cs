@@ -24,7 +24,7 @@ public class GameWagerQueryServiceUnitTest
         var sysUtcNow = DateTimeOffset.UtcNow;
         var resp = new GameDetailTransactionResp[]
             {
-                new GameDetailTransactionResp(
+                new(
                 HistoryId: sysUtcNow.ToUnixTimeMilliseconds().ToString(),
                 PlayerId:"test",
                 GameType:1,
@@ -99,7 +99,7 @@ public class GameWagerQueryServiceUnitTest
         var sysUtcNow = DateTimeOffset.UtcNow;
         var resp = new GameDetailTransactionResp[]
             {
-                new GameDetailTransactionResp(
+                new(
                 HistoryId: sysUtcNow.ToUnixTimeMilliseconds().ToString(),
                 PlayerId:"4ugse0rsnufp",
                 GameType:0,

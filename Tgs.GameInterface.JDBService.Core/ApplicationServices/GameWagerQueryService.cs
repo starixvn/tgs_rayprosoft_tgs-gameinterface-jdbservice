@@ -4,20 +4,14 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.GameInterface.JDBService.Core.ApplicationServices;
 
-internal class GameWagerQueryService : IQueryService<GameWagerQuery, GameWagerResult>
+internal class GameWagerQueryService(
+    IGameApiClient client) : IQueryService<GameWagerQuery, GameWagerResult>
 {
-    private readonly IGameApiClient _client;
-
-    public GameWagerQueryService(IGameApiClient client)
-    {
-        _client = client ?? throw new ArgumentNullException(nameof(client));
-    }
-
     public async IAsyncEnumerable<GameWagerResult> QueryAsync(
         GameWagerQuery query,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        var transactions = await _client
+        var transactions = await client
             .SearchGameTransactionDetailsAsync(
             apiUrl: query.ApiUrl,
             domain: query.Domain,

@@ -4,15 +4,9 @@ using Tgs.GameInterface.JDBService.Protos;
 
 namespace Tgs.GameInterface.JDBService.Client;
 
-internal class GameInterfaceJDBClient : IGameInterfaceJDBClient
+internal class GameInterfaceJDBClient(
+    GameInterfaceJDBService.GameInterfaceJDBServiceClient client) : IGameInterfaceJDBClient
 {
-    private readonly GameInterfaceJDBService.GameInterfaceJDBServiceClient _client;
-
-    public GameInterfaceJDBClient(GameInterfaceJDBService.GameInterfaceJDBServiceClient client)
-    {
-        _client = client ?? throw new ArgumentNullException(nameof(client));
-    }
-
     public async ValueTask<string> CheckingServiceAsync(
         string machineName,
         CancellationToken cancellationToken = default)
@@ -22,7 +16,7 @@ internal class GameInterfaceJDBClient : IGameInterfaceJDBClient
             MachineName = machineName,
         };
 
-        var reply = await _client
+        var reply = await client
             .CheckingServiceAsync(
                 request: request,
                 cancellationToken: cancellationToken)
@@ -53,7 +47,7 @@ internal class GameInterfaceJDBClient : IGameInterfaceJDBClient
             SerialNo = serialNo,
             Amount = amount
         };
-        return await _client
+        return await client
             .FundInAsync(
                 request: request,
                 cancellationToken: cancellationToken)
@@ -82,7 +76,7 @@ internal class GameInterfaceJDBClient : IGameInterfaceJDBClient
             SerialNo = serialNo,
             Amount = amount
         };
-        return await _client
+        return await client
             .FundOutAsync(
                 request: request,
                 cancellationToken: cancellationToken)
@@ -107,7 +101,7 @@ internal class GameInterfaceJDBClient : IGameInterfaceJDBClient
             Agent = agent,
             SerialNo = serialNo
         };
-        var reply = await _client
+        var reply = await client
             .FundStatusAsync(
                 request: request,
                 cancellationToken: cancellationToken)
@@ -136,13 +130,13 @@ internal class GameInterfaceJDBClient : IGameInterfaceJDBClient
             StartTime = startTime.ToTimestamp(),
             EndTime = endTime.ToTimestamp()
         };
-        var reply = await _client
+        var reply = await client
             .GameHistoryAsync(
                 request: request,
                 cancellationToken: cancellationToken)
             .ConfigureAwait(false);
 
-        if (!reply.Items.Any())
+        if (reply.Items.Count == 0)
         {
             yield break;
         }
@@ -173,13 +167,13 @@ internal class GameInterfaceJDBClient : IGameInterfaceJDBClient
             StartTime = startTime.ToTimestamp(),
             EndTime = endTime.ToTimestamp()
         };
-        var reply = await _client
+        var reply = await client
             .GameOldHistoryAsync(
                 request: request,
                 cancellationToken: cancellationToken)
             .ConfigureAwait(false);
 
-        if (!reply.Items.Any())
+        if (reply.Items.Count == 0)
         {
             yield break;
         }
@@ -212,7 +206,7 @@ internal class GameInterfaceJDBClient : IGameInterfaceJDBClient
             MachineType = machineType,
             Lang = lang
         };
-        return await _client
+        return await client
             .GameUrlAsync(
                 request: request,
                 cancellationToken: cancellationToken)
@@ -239,13 +233,13 @@ internal class GameInterfaceJDBClient : IGameInterfaceJDBClient
             StartTime = startTime.ToTimestamp(),
             EndTime = endTime.ToTimestamp()
         };
-        var reply = await _client
+        var reply = await client
             .GameWagerAsync(
             request: request,
             cancellationToken: cancellationToken)
             .ConfigureAwait(false);
 
-        if (!reply.Items.Any())
+        if (reply.Items.Count == 0)
         {
             yield break;
         }
@@ -276,13 +270,13 @@ internal class GameInterfaceJDBClient : IGameInterfaceJDBClient
             StartTime = startTime.ToTimestamp(),
             EndTime = endTime.ToTimestamp()
         };
-        var reply = await _client
+        var reply = await client
             .GameWagerOldAsync(
             request: request,
             cancellationToken: cancellationToken)
             .ConfigureAwait(false);
 
-        if (!reply.Items.Any())
+        if (reply.Items.Count == 0)
         {
             yield break;
         }
@@ -311,7 +305,7 @@ internal class GameInterfaceJDBClient : IGameInterfaceJDBClient
             Agent = agent,
             PlayerCode = playerCode
         };
-        return await _client
+        return await client
             .PlayerBalanceAsync(
                 request: request,
                 cancellationToken: cancellationToken)
@@ -336,7 +330,7 @@ internal class GameInterfaceJDBClient : IGameInterfaceJDBClient
             Agent = agent,
             PlayerCode = playerCode
         };
-        _ = await _client
+        _ = await client
             .PlayerCreateAsync(
                 request: request,
                 cancellationToken: cancellationToken)
@@ -361,7 +355,7 @@ internal class GameInterfaceJDBClient : IGameInterfaceJDBClient
             Agent = agent,
             PlayerCode = playerCode
         };
-        _ = await _client
+        _ = await client
             .PlayerKickAsync(
                 request: request,
                 cancellationToken: cancellationToken)

@@ -2,20 +2,14 @@
 
 namespace Tgs.GameInterface.JDBService.Core.ApplicationServices;
 
-internal class PlayerBalanceGetService : IGetService<PlayerBalanceQuery, PlayerBalanceResult>
+internal class PlayerBalanceGetService(
+    IGameApiClient client) : IGetService<PlayerBalanceQuery, PlayerBalanceResult>
 {
-    private readonly IGameApiClient _client;
-
-    public PlayerBalanceGetService(IGameApiClient client)
-    {
-        _client = client ?? throw new ArgumentNullException(nameof(client));
-    }
-
     public async ValueTask<PlayerBalanceResult> GetAsync(
         PlayerBalanceQuery query,
         CancellationToken cancellationToken = default)
     {
-        (bool IsPlayerExist, decimal Balance) = await _client
+        (bool IsPlayerExist, decimal Balance) = await client
                 .SearchPlayerInformationAsync(
                     query.ApiUrl,
                     query.Domain,

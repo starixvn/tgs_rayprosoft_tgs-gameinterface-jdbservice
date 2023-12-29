@@ -4,20 +4,14 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.GameInterface.JDBService.Core.ApplicationServices;
 
-internal class GameHistoryQueryService : IQueryService<GameHistoryQuery, GameHistoryResult>
+internal class GameHistoryQueryService(
+    IGameApiClient client) : IQueryService<GameHistoryQuery, GameHistoryResult>
 {
-    private readonly IGameApiClient _client;
-
-    public GameHistoryQueryService(IGameApiClient client)
-    {
-        _client = client ?? throw new ArgumentNullException(nameof(client));
-    }
-
     public async IAsyncEnumerable<GameHistoryResult> QueryAsync(
         GameHistoryQuery query,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        var transactions = await _client
+        var transactions = await client
             .SearchGameTransactionDetailsAsync(
             apiUrl: query.ApiUrl,
             domain: query.Domain,
