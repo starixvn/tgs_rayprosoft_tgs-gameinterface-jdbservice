@@ -247,7 +247,7 @@ internal class GameApiClient : IGameApiClient
                 PlayerIp: transaction["playerIp"]!.ToString(),
                 ClientType: transaction["clientType"]!.ToString(),
                 HasFreegame: transaction["hasFreegame"]?.GetValue<int>() ?? 0,
-                HasGamble: transaction["hasGamble"]?.GetValue<int>() ?? 0,
+                HasGamble: 0,
                 GambleBet: -transaction["gambleBet"]?.GetValue<decimal>() ?? 0.0m,
                 SystemTakeWin: transaction["systemTakeWin"]?.GetValue<int>() ?? 0,
                 AdditionalData: transaction.ToJsonString());
@@ -326,7 +326,7 @@ internal class GameApiClient : IGameApiClient
                 PlayerIp: transaction["playerIp"]!.ToString(),
                 ClientType: transaction["clientType"]!.ToString(),
                 HasFreegame: transaction["hasFreegame"]?.GetValue<int>() ?? 0,
-                HasGamble: transaction["hasGamble"]?.GetValue<int>() ?? 0,
+                HasGamble: 0,
                 GambleBet: -transaction["gambleBet"]?.GetValue<decimal>() ?? 0.0m,
                 SystemTakeWin: transaction["systemTakeWin"]?.GetValue<int>() ?? 0,
                 AdditionalData: transaction.ToJsonString());
