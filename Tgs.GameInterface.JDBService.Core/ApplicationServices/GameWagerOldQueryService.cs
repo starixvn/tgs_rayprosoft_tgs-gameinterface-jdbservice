@@ -39,6 +39,7 @@ internal class GameWagerOldQueryService(
 
             yield return new GameWagerResult(
                 PlayerCode: transaction.PlayerId,
+                ExternalRoundId: transaction.RoundSeqNo.ToString(),
                 ExternalWagerId: transaction.HistoryId.ToString(),
                 ExternalGameId: $"{transaction.GameType}_{transaction.MachineType}",
                 FreeGameState: freeGameState,

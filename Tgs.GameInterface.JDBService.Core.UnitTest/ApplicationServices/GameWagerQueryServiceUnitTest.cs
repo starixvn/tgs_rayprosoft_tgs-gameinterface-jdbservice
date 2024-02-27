@@ -25,29 +25,30 @@ public class GameWagerQueryServiceUnitTest
         var resp = new GameDetailTransactionResp[]
             {
                 new(
-                HistoryId: sysUtcNow.ToUnixTimeMilliseconds().ToString(),
-                PlayerId:"test",
-                GameType:1,
-                MachineType:0,
-                GameDate:sysUtcNow,
-                Bet:10,
-                Win:20,
-                Total:10,
-                Currency:"PP",
-                Jackpot:0.0m,
-                JackpotContribute:0.0m,
-                Denom:0.1m,
-                LastModifyTime:sysUtcNow,
-                PlayerIp:"::1",
-                ClientType:"PC",
-                HasFreegame:0,
-                HasGamble:0,
-                GambleBet:0,
-                SystemTakeWin:0,
-                AdditionalData:new JsonObject
-                {
-                    ["historyId"] = sysUtcNow.ToUnixTimeMilliseconds()
-                }.ToJsonString())
+                    RoundSeqNo:sysUtcNow.ToUnixTimeMilliseconds().ToString(),
+                    HistoryId: sysUtcNow.ToUnixTimeMilliseconds().ToString(),
+                    PlayerId:"test",
+                    GameType:1,
+                    MachineType:0,
+                    GameDate:sysUtcNow,
+                    Bet:10,
+                    Win:20,
+                    Total:10,
+                    Currency:"PP",
+                    Jackpot:0.0m,
+                    JackpotContribute:0.0m,
+                    Denom:0.1m,
+                    LastModifyTime:sysUtcNow,
+                    PlayerIp:"::1",
+                    ClientType:"PC",
+                    HasFreegame:0,
+                    HasGamble:0,
+                    GambleBet:0,
+                    SystemTakeWin:0,
+                    AdditionalData:new JsonObject
+                    {
+                        ["historyId"] = sysUtcNow.ToUnixTimeMilliseconds()
+                    }.ToJsonString())
             };
         _ = fakeClient
             .SearchGameTransactionDetailsAsync(
@@ -100,47 +101,48 @@ public class GameWagerQueryServiceUnitTest
         var resp = new GameDetailTransactionResp[]
             {
                 new(
-                HistoryId: sysUtcNow.ToUnixTimeMilliseconds().ToString(),
-                PlayerId:"4ugse0rsnufp",
-                GameType:0,
-                MachineType:15010,
-                GameDate:sysUtcNow,
-                Bet:0.5m,
-                Win:65.5m,
-                Total:65.0m,
-                Currency:"RB",
-                Jackpot:0.0m,
-                JackpotContribute:-0.0025m,
-                Denom:0.01m,
-                LastModifyTime:sysUtcNow,
-                PlayerIp:"114.33.41.237",
-                ClientType:"WEB",
-                HasFreegame:1,
-                HasGamble:0,
-                GambleBet:0,
-                SystemTakeWin:0,
-                AdditionalData:new JsonObject
-                {
-                    ["seqNo"]= 5250214464421,
-                    ["playerId"]= "4ugse0rsnufp",
-                    ["gType"]= 0,
-                    ["mtype"]= 15010,
-                    ["gameDate"]= "19-09-2023 23:38:01",
-                    ["bet"]= -0.5,
-                    ["win"]= 65.5,
-                    ["total"]= 65.0,
-                    ["currency"]= "RB",
-                    ["jackpot"]= 0.0,
-                    ["jackpotContribute"]=  -0.0025,
-                    ["denom"]= 0.01,
-                    ["lastModifyTime"]= "19-09-2023 23:38:01",
-                    ["playerIp"]= "114.33.41.237",
-                    ["clientType"]= "WEB",
-                    ["hasFreegame"]= 1,
-                    ["hasGamble"]= 0,
-                    ["gambleBet"]= 0.0,
-                    ["systemTakeWin"]= 0
-                }.ToJsonString())
+                    RoundSeqNo:sysUtcNow.ToUnixTimeMilliseconds().ToString(),
+                    HistoryId: sysUtcNow.ToUnixTimeMilliseconds().ToString(),
+                    PlayerId:"4ugse0rsnufp",
+                    GameType:0,
+                    MachineType:15010,
+                    GameDate:sysUtcNow,
+                    Bet:0.5m,
+                    Win:65.5m,
+                    Total:65.0m,
+                    Currency:"RB",
+                    Jackpot:0.0m,
+                    JackpotContribute:-0.0025m,
+                    Denom:0.01m,
+                    LastModifyTime:sysUtcNow,
+                    PlayerIp:"114.33.41.237",
+                    ClientType:"WEB",
+                    HasFreegame:1,
+                    HasGamble:0,
+                    GambleBet:0,
+                    SystemTakeWin:0,
+                    AdditionalData:new JsonObject
+                    {
+                        ["seqNo"]= 5250214464421,
+                        ["playerId"]= "4ugse0rsnufp",
+                        ["gType"]= 0,
+                        ["mtype"]= 15010,
+                        ["gameDate"]= "19-09-2023 23:38:01",
+                        ["bet"]= -0.5,
+                        ["win"]= 65.5,
+                        ["total"]= 65.0,
+                        ["currency"]= "RB",
+                        ["jackpot"]= 0.0,
+                        ["jackpotContribute"]=  -0.0025,
+                        ["denom"]= 0.01,
+                        ["lastModifyTime"]= "19-09-2023 23:38:01",
+                        ["playerIp"]= "114.33.41.237",
+                        ["clientType"]= "WEB",
+                        ["hasFreegame"]= 1,
+                        ["hasGamble"]= 0,
+                        ["gambleBet"]= 0.0,
+                        ["systemTakeWin"]= 0
+                    }.ToJsonString())
             };
         _ = fakeClient
             .SearchGameTransactionDetailsAsync(

@@ -44,14 +44,7 @@ internal class GameApiClient : IGameApiClient
         };
     }
 
-    public async ValueTask<bool> CheckCashTransferAsync(
-        Uri apiUrl,
-        string domain,
-        string aesKey,
-        string aesIV,
-        string agent,
-        string serialNo,
-        CancellationToken cancellationToken = default)
+    public async ValueTask<bool> CheckCashTransferAsync(Uri apiUrl, string domain, string aesKey, string aesIV, string agent, string serialNo, CancellationToken cancellationToken = default)
     {
         var data = new
         {
@@ -80,14 +73,7 @@ internal class GameApiClient : IGameApiClient
         return jsonNode["status"]!.ToString().Equals("0000", StringComparison.OrdinalIgnoreCase);
     }
 
-    public async ValueTask CreatePlayerAsync(
-        Uri apiUrl,
-        string domain,
-        string aesKey,
-        string aesIV,
-        string agent,
-        string playerCode,
-        CancellationToken cancellationToken = default)
+    public async ValueTask CreatePlayerAsync(Uri apiUrl, string domain, string aesKey, string aesIV, string agent, string playerCode, CancellationToken cancellationToken = default)
     {
         var data = new
         {
@@ -123,16 +109,7 @@ internal class GameApiClient : IGameApiClient
         }
     }
 
-    public async ValueTask<TransactionResp> DepositAsync(
-        Uri apiUrl,
-        string domain,
-        string aesKey,
-        string aesIV,
-        string agent,
-        string playerCode,
-        string serialNo,
-        decimal amount,
-        CancellationToken cancellationToken = default)
+    public async ValueTask<TransactionResp> DepositAsync(Uri apiUrl, string domain, string aesKey, string aesIV, string agent, string playerCode, string serialNo, decimal amount, CancellationToken cancellationToken = default)
     {
         var data = new
         {
@@ -175,15 +152,7 @@ internal class GameApiClient : IGameApiClient
                 Resp: jsonNode.ToJsonString());
     }
 
-    public async IAsyncEnumerable<GameDetailTransactionResp> SearchGameTransactionDetailsAsync(
-        Uri apiUrl,
-        string domain,
-        string aesKey,
-        string aesIV,
-        string agent,
-        DateTime startTime,
-        DateTime endTime,
-        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    public async IAsyncEnumerable<GameDetailTransactionResp> SearchGameTransactionDetailsAsync(Uri apiUrl, string domain, string aesKey, string aesIV, string agent, DateTime startTime, DateTime endTime, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         var data = new
         {
@@ -231,6 +200,7 @@ internal class GameApiClient : IGameApiClient
                 continue;
             }
             yield return new GameDetailTransactionResp(
+                RoundSeqNo: transaction["roundSeqNo"]?.ToString() ?? transaction["historyId"]?.ToString() ?? transaction["seqNo"]!.ToString(),
                 HistoryId: transaction["historyId"]?.ToString() ?? transaction["seqNo"]!.ToString(),
                 PlayerId: transaction["playerId"]!.ToString(),
                 GameType: transaction["gType"]!.GetValue<int>(),
@@ -247,22 +217,14 @@ internal class GameApiClient : IGameApiClient
                 PlayerIp: transaction["playerIp"]!.ToString(),
                 ClientType: transaction["clientType"]!.ToString(),
                 HasFreegame: transaction["hasFreegame"]?.GetValue<int>() ?? 0,
-                HasGamble: 0,
+                HasGamble: transaction["hasGamble"]?.GetValue<int>() ?? 0,
                 GambleBet: -transaction["gambleBet"]?.GetValue<decimal>() ?? 0.0m,
                 SystemTakeWin: transaction["systemTakeWin"]?.GetValue<int>() ?? 0,
                 AdditionalData: transaction.ToJsonString());
         }
     }
 
-    public async IAsyncEnumerable<GameDetailTransactionResp> SearchGameOldTransactionDetailsAsync(
-        Uri apiUrl,
-        string domain,
-        string aesKey,
-        string aesIV,
-        string agent,
-        DateTime startTime,
-        DateTime endTime,
-        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    public async IAsyncEnumerable<GameDetailTransactionResp> SearchGameOldTransactionDetailsAsync(Uri apiUrl, string domain, string aesKey, string aesIV, string agent, DateTime startTime, DateTime endTime, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         var data = new
         {
@@ -310,6 +272,7 @@ internal class GameApiClient : IGameApiClient
                 continue;
             }
             yield return new GameDetailTransactionResp(
+                RoundSeqNo: transaction["roundSeqNo"]?.ToString() ?? transaction["historyId"]?.ToString() ?? transaction["seqNo"]!.ToString(),
                 HistoryId: transaction["historyId"]?.ToString() ?? transaction["seqNo"]!.ToString(),
                 PlayerId: transaction["playerId"]!.ToString(),
                 GameType: transaction["gType"]!.GetValue<int>(),
@@ -326,21 +289,14 @@ internal class GameApiClient : IGameApiClient
                 PlayerIp: transaction["playerIp"]!.ToString(),
                 ClientType: transaction["clientType"]!.ToString(),
                 HasFreegame: transaction["hasFreegame"]?.GetValue<int>() ?? 0,
-                HasGamble: 0,
+                HasGamble: transaction["hasGamble"]?.GetValue<int>() ?? 0,
                 GambleBet: -transaction["gambleBet"]?.GetValue<decimal>() ?? 0.0m,
                 SystemTakeWin: transaction["systemTakeWin"]?.GetValue<int>() ?? 0,
                 AdditionalData: transaction.ToJsonString());
         }
     }
 
-    public async ValueTask<(bool IsPlayerExist, decimal Balance)> SearchPlayerInformationAsync(
-        Uri apiUrl,
-        string domain,
-        string aesKey,
-        string aesIV,
-        string agent,
-        string playerCode,
-        CancellationToken cancellationToken = default)
+    public async ValueTask<(bool IsPlayerExist, decimal Balance)> SearchPlayerInformationAsync(Uri apiUrl, string domain, string aesKey, string aesIV, string agent, string playerCode, CancellationToken cancellationToken = default)
     {
         var data = new
         {
@@ -375,16 +331,7 @@ internal class GameApiClient : IGameApiClient
             : (true, jsonNode["data"]![0]!["balance"]!.GetValue<decimal>());
     }
 
-    public async ValueTask<(bool IsPlayerExist, string GameUrl)> GetTokenAsync(
-        Uri apiUrl,
-        string domain,
-        string aesKey,
-        string aesIV,
-        string playerCode,
-        string gameType,
-        string machineType,
-        string lang,
-        CancellationToken cancellationToken = default)
+    public async ValueTask<(bool IsPlayerExist, string GameUrl)> GetTokenAsync(Uri apiUrl, string domain, string aesKey, string aesIV, string playerCode, string gameType, string machineType, string lang, CancellationToken cancellationToken = default)
     {
         var data = new
         {
@@ -425,14 +372,7 @@ internal class GameApiClient : IGameApiClient
             : (true, jsonNode["path"]!.ToString());
     }
 
-    public async ValueTask KickOutPlayerAsync(
-        Uri apiUrl,
-        string domain,
-        string aesKey,
-        string aesIV,
-        string agent,
-        string playerCode,
-        CancellationToken cancellationToken = default)
+    public async ValueTask KickOutPlayerAsync(Uri apiUrl, string domain, string aesKey, string aesIV, string agent, string playerCode, CancellationToken cancellationToken = default)
 
     {
         var data = new
@@ -467,16 +407,7 @@ internal class GameApiClient : IGameApiClient
         }
     }
 
-    public async ValueTask<TransactionResp> WithdrawalAsync(
-        Uri apiUrl,
-        string domain,
-        string aesKey,
-        string aesIV,
-        string agent,
-        string playerCode,
-        string serialNo,
-        decimal amount,
-        CancellationToken cancellationToken = default)
+    public async ValueTask<TransactionResp> WithdrawalAsync(Uri apiUrl, string domain, string aesKey, string aesIV, string agent, string playerCode, string serialNo, decimal amount, CancellationToken cancellationToken = default)
     {
         var retryPolicy = Policy
                 .HandleResult<JsonNode>(r =>
@@ -529,12 +460,7 @@ internal class GameApiClient : IGameApiClient
                 Resp: jsonNode.ToJsonString());
     }
 
-    private async ValueTask<JsonNode> PostAsync(
-        Uri apiUrl,
-        string domain,
-        string encryptedData,
-        string action,
-        CancellationToken cancellationToken = default)
+    private async ValueTask<JsonNode> PostAsync(Uri apiUrl, string domain, string encryptedData, string action, CancellationToken cancellationToken = default)
     {
         var logPrefix = $"{nameof(GameApiClient)}.{action}".ToLower();
 

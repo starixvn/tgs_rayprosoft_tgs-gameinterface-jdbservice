@@ -1,7 +1,6 @@
 ﻿using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Tgs.GameInterface.JDBService.Core.ApplicationServices;
-using Tgs.GameInterface.JDBService.Core.Models;
 using Tgs.GameInterface.JDBService.Protos;
 using Tgs.ServiceUtility;
 
@@ -16,8 +15,6 @@ public class GameInterfaceJDBGrpcService(
     IGetService<FundOutQuery, FundResult> fundOutService,
     IGetService<FundStatusQuery, bool> fundStatusService,
     IGetService<GameUrlQuery, GameUrlResult> gameUrlService,
-    IQueryService<GameHistoryQuery, GameHistoryResult> gameHistoryService,
-    IQueryService<GameOldHistoryQuery, GameHistoryResult> gameOldHistoryService,
     IQueryService<GameWagerQuery, GameWagerResult> gameWagerService,
     IQueryService<GameWagerOldQuery, GameWagerResult> gameWagerOldService) : GameInterfaceJDBService.GameInterfaceJDBServiceBase
 {
@@ -103,96 +100,6 @@ public class GameInterfaceJDBGrpcService(
         };
     }
 
-    public override async Task<GameHistoryReply> GameHistory(GameHistoryRequest request, ServerCallContext context)
-    {
-        var query = new GameHistoryQuery(
-        new Uri(request.ApiUrl),
-        request.Domain,
-        request.AesKey,
-        request.AesIV,
-        request.Agent,
-        request.StartTime.ToDateTime(),
-        request.EndTime.ToDateTime());
-
-        var results = await gameHistoryService
-            .QueryAsync(
-            query: query,
-            cancellationToken: context.CancellationToken)
-            .ToArrayAsync()
-            .ConfigureAwait(false)
-            ?? Enumerable.Empty<GameHistoryResult>();
-
-        var reply = new GameHistoryReply();
-
-        if (results.Any())
-        {
-            foreach (var result in results)
-            {
-                reply.Items.Add(new GameHistoryInfo()
-                {
-                    PlayerCode = result.PlayerCode,
-                    ExternalRoundId = result.ExternalRoundId,
-                    ExternalGameId = result.ExternalGameId,
-                    ExternalCreatedOn = result.ExternalCreatedOn.ToTimestamp(),
-                    ExternalClosedOn = result.ExternalClosedOn.ToTimestamp(),
-                    Bet = result.Bet,
-                    ValidBet = result.ValidBet,
-                    PlayerWinLoss = result.PlayerWinLoss,
-                    Turnover = result.Turnover,
-                    Settle = result.Settle,
-                    AdditionalData = result.AdditionalData
-                });
-            }
-        }
-
-        return reply;
-    }
-
-    public override async Task<GameHistoryReply> GameOldHistory(GameHistoryRequest request, ServerCallContext context)
-    {
-        var query = new GameOldHistoryQuery(
-        new Uri(request.ApiUrl),
-        request.Domain,
-        request.AesKey,
-        request.AesIV,
-        request.Agent,
-        request.StartTime.ToDateTime(),
-        request.EndTime.ToDateTime());
-
-        var results = await gameOldHistoryService
-            .QueryAsync(
-            query: query,
-            cancellationToken: context.CancellationToken)
-            .ToArrayAsync()
-            .ConfigureAwait(false)
-            ?? Enumerable.Empty<GameHistoryResult>();
-
-        var reply = new GameHistoryReply();
-
-        if (results.Any())
-        {
-            foreach (var result in results)
-            {
-                reply.Items.Add(new GameHistoryInfo()
-                {
-                    PlayerCode = result.PlayerCode,
-                    ExternalRoundId = result.ExternalRoundId,
-                    ExternalGameId = result.ExternalGameId,
-                    ExternalCreatedOn = result.ExternalCreatedOn.ToTimestamp(),
-                    ExternalClosedOn = result.ExternalClosedOn.ToTimestamp(),
-                    Bet = result.Bet,
-                    ValidBet = result.ValidBet,
-                    PlayerWinLoss = result.PlayerWinLoss,
-                    Turnover = result.Turnover,
-                    Settle = result.Settle,
-                    AdditionalData = result.AdditionalData
-                });
-            }
-        }
-
-        return reply;
-    }
-
     public override async Task<GameUrlReply> GameUrl(GameUrlRequest request, ServerCallContext context)
     {
         var query = new GameUrlQuery(
@@ -246,6 +153,7 @@ public class GameInterfaceJDBGrpcService(
                 reply.Items.Add(new GameWagerInfo()
                 {
                     PlayerCode = result.PlayerCode,
+                    ExternalRoundId = result.ExternalRoundId,
                     ExternalWagerId = result.ExternalWagerId,
                     ExternalGameId = result.ExternalGameId,
                     FreeGameState = result.FreeGameState,
@@ -291,6 +199,7 @@ public class GameInterfaceJDBGrpcService(
                 reply.Items.Add(new GameWagerInfo()
                 {
                     PlayerCode = result.PlayerCode,
+                    ExternalRoundId = result.ExternalRoundId,
                     ExternalWagerId = result.ExternalWagerId,
                     ExternalGameId = result.ExternalGameId,
                     FreeGameState = result.FreeGameState,

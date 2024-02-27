@@ -190,70 +190,6 @@ public class JDBController : ControllerBase
     }
 
     /// <summary>
-    /// Games the history asynchronous.
-    /// </summary>
-    /// <param name="service">The service.</param>
-    /// <param name="source">The source.</param>
-    /// <returns></returns>
-    /// <remarks>
-    /// <b>Example</b><br />
-    ///
-    ///     Post
-    ///
-    ///         {
-    ///             "apiUrl": "http://api.jygrq.com",
-    ///             "domain": "ZF",
-    ///             "aesKey": "831057181dd07807",
-    ///             "aesIV": "193a3159afebee65",
-    ///             "agent": "zf055gpi",
-    ///             "startTime": "2022-09-07T18:50:00+08:00",
-    ///             "endTime": "2022-09-07T18:55:00+08:00"
-    ///         }
-    /// </remarks>
-    [HttpPost("game/history", Name = "GameHistory")]
-    public async IAsyncEnumerable<GameHistoryResultViewModel> GameHistoryAsync(
-        [FromServices] IQueryService<GameHistoryQuery, GameHistoryResult> service,
-        GameHistoryViewModel source)
-    {
-        var query = new GameHistoryQuery(
-            source.ApiUrl,
-            source.Domain,
-            source.AesKey,
-            source.AesIV,
-            source.Agent,
-            source.StartTime,
-            source.EndTime);
-
-        var results = await service
-                 .QueryAsync(
-                     query: query,
-                     cancellationToken: HttpContext.RequestAborted)
-                 .ToArrayAsync()
-                 .ConfigureAwait(false);
-
-        if (results.Length == 0)
-        {
-            yield break;
-        }
-
-        foreach (var result in results)
-        {
-            yield return new GameHistoryResultViewModel(
-                result.PlayerCode,
-                result.ExternalRoundId,
-                result.ExternalGameId,
-                result.ExternalCreatedOn,
-                result.ExternalClosedOn,
-                result.Bet,
-                result.ValidBet,
-                result.PlayerWinLoss,
-                result.Turnover,
-                result.Settle,
-                result.AdditionalData);
-        }
-    }
-
-    /// <summary>
     /// Games the wager asynchronous.
     /// </summary>
     /// <param name="service">The service.</param>
@@ -303,81 +239,18 @@ public class JDBController : ControllerBase
         foreach (var result in results)
         {
             yield return new GameWagerResultViewModel(
-                result.PlayerCode,
-                result.ExternalWagerId,
-                result.ExternalGameId,
-                result.FreeGameState,
-                result.GambleState,
-                result.ExternalCreatedOn,
-                result.ExternalClosedOn,
-                result.Bet,
-                result.Settle,
-                result.WinLoss,
-                result.AdditionalData);
-        }
-    }
-
-    /// <summary>
-    /// Games the old history asynchronous.
-    /// </summary>
-    /// <param name="service">The service.</param>
-    /// <param name="source">The source.</param>
-    /// <returns></returns>
-    /// <remarks>
-    /// <b>Example</b><br />
-    ///
-    ///     Post
-    ///
-    ///         {
-    ///             "apiUrl": "http://api.jygrq.com",
-    ///             "domain": "ZF",
-    ///             "aesKey": "831057181dd07807",
-    ///             "aesIV": "193a3159afebee65",
-    ///             "agent": "zf055gpi",
-    ///             "startTime": "2022-09-07T18:50:00+08:00",
-    ///             "endTime": "2022-09-07T18:55:00+08:00"
-    ///         }
-    /// </remarks>
-    [HttpPost("game/history/old", Name = "GameOldHistory")]
-    public async IAsyncEnumerable<GameHistoryResultViewModel> GameOldHistoryAsync(
-        [FromServices] IQueryService<GameOldHistoryQuery, GameHistoryResult> service,
-        GameHistoryViewModel source)
-    {
-        var query = new GameOldHistoryQuery(
-            source.ApiUrl,
-            source.Domain,
-            source.AesKey,
-            source.AesIV,
-            source.Agent,
-            source.StartTime,
-            source.EndTime);
-
-        var results = await service
-                 .QueryAsync(
-                     query: query,
-                     cancellationToken: HttpContext.RequestAborted)
-                 .ToArrayAsync()
-                 .ConfigureAwait(false);
-
-        if (results.Length == 0)
-        {
-            yield break;
-        }
-
-        foreach (var result in results)
-        {
-            yield return new GameHistoryResultViewModel(
-                result.PlayerCode,
-                result.ExternalRoundId,
-                result.ExternalGameId,
-                result.ExternalCreatedOn,
-                result.ExternalClosedOn,
-                result.Bet,
-                result.ValidBet,
-                result.PlayerWinLoss,
-                result.Turnover,
-                result.Settle,
-                result.AdditionalData);
+                PlayerCode: result.PlayerCode,
+                ExternalRoundId: result.ExternalRoundId,
+                ExternalWagerId: result.ExternalWagerId,
+                ExternalGameId: result.ExternalGameId,
+                FreeGameState: result.FreeGameState,
+                GambleState: result.GambleState,
+                ExternalCreatedOn: result.ExternalCreatedOn,
+                ExternalClosedOn: result.ExternalClosedOn,
+                Bet: result.Bet,
+                Settle: result.Settle,
+                WinLoss: result.WinLoss,
+                AdditionalData: result.AdditionalData);
         }
     }
 
@@ -431,17 +304,18 @@ public class JDBController : ControllerBase
         foreach (var result in results)
         {
             yield return new GameWagerResultViewModel(
-                result.PlayerCode,
-                result.ExternalWagerId,
-                result.ExternalGameId,
-                result.FreeGameState,
-                result.GambleState,
-                result.ExternalCreatedOn,
-                result.ExternalClosedOn,
-                result.Bet,
-                result.Settle,
-                result.WinLoss,
-                result.AdditionalData);
+                PlayerCode: result.PlayerCode,
+                ExternalRoundId: result.ExternalRoundId,
+                ExternalWagerId: result.ExternalWagerId,
+                ExternalGameId: result.ExternalGameId,
+                FreeGameState: result.FreeGameState,
+                GambleState: result.GambleState,
+                ExternalCreatedOn: result.ExternalCreatedOn,
+                ExternalClosedOn: result.ExternalClosedOn,
+                Bet: result.Bet,
+                Settle: result.Settle,
+                WinLoss: result.WinLoss,
+                AdditionalData: result.AdditionalData);
         }
     }
 

@@ -25,29 +25,30 @@ public class GameWagerOldQueryServiceUnitTest
         var resp = new GameDetailTransactionResp[]
             {
                 new(
-                HistoryId: sysUtcNow.ToUnixTimeMilliseconds().ToString(),
-                PlayerId:"test",
-                GameType:1,
-                MachineType:0,
-                GameDate:sysUtcNow,
-                Bet:10,
-                Win:20,
-                Total:10,
-                Currency:"PP",
-                Jackpot:0.0m,
-                JackpotContribute:0.0m,
-                Denom:0.1m,
-                LastModifyTime:sysUtcNow,
-                PlayerIp:"::1",
-                ClientType:"PC",
-                HasFreegame:0,
-                HasGamble:0,
-                GambleBet:0,
-                SystemTakeWin:0,
-                AdditionalData:new JsonObject
-                {
-                    ["historyId"] = sysUtcNow.ToUnixTimeMilliseconds()
-                }.ToJsonString())
+                    RoundSeqNo:sysUtcNow.ToUnixTimeMilliseconds().ToString(),
+                    HistoryId: sysUtcNow.ToUnixTimeMilliseconds().ToString(),
+                    PlayerId:"test",
+                    GameType:1,
+                    MachineType:0,
+                    GameDate:sysUtcNow,
+                    Bet:10,
+                    Win:20,
+                    Total:10,
+                    Currency:"PP",
+                    Jackpot:0.0m,
+                    JackpotContribute:0.0m,
+                    Denom:0.1m,
+                    LastModifyTime:sysUtcNow,
+                    PlayerIp:"::1",
+                    ClientType:"PC",
+                    HasFreegame:0,
+                    HasGamble:0,
+                    GambleBet:0,
+                    SystemTakeWin:0,
+                    AdditionalData:new JsonObject
+                    {
+                        ["historyId"] = sysUtcNow.ToUnixTimeMilliseconds()
+                    }.ToJsonString())
             };
         _ = fakeClient
             .SearchGameOldTransactionDetailsAsync(

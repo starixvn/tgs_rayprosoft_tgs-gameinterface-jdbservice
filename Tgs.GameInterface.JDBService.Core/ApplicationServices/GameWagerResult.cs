@@ -2,6 +2,7 @@
 
 public record GameWagerResult(
     string PlayerCode,
+    string ExternalRoundId,
     string ExternalWagerId,
     string ExternalGameId,
     bool FreeGameState,
