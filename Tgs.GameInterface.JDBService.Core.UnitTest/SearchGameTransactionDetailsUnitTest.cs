@@ -138,25 +138,25 @@ public class SearchGameTransactionDetailsUnitTest
             ["data"] = new JsonArray {
                 new JsonObject
                 {
-                    ["bet"]= -2.0,
-                    ["win"]= 4.0,
-                    ["denom"]= 2.0,
+                    ["bet"]= -0.25,
+                    ["win"]= 1.25,
+                    ["denom"]= 0.01,
                     ["gType"]= 0,
-                    ["mtype"]= 14042,
-                    ["seqNo"]= 7405918749700,
-                    ["total"]= 2.0,
+                    ["mtype"]= 8020,
+                    ["seqNo"]= 7410025380879,
+                    ["total"]= 1.0,
                     ["jackpot"]= 0.0,
                     ["currency"]= "PP",
-                    ["gameDate"]= "26-02-2024 22:25:14",
-                    ["playerId"]= "4ujgn5ht6x7m",
-                    ["playerIp"]= "175.176.24.123",
-                    ["gambleBet"]= 0.0,
-                    ["hasGamble"]= 0,
-                    ["historyId"]= "7405918749700",
+                    ["gameDate"]= "19-03-2024 23:15:47",
+                    ["playerId"]= "4ugyisoukd9p",
+                    ["playerIp"]= "136.158.3.190",
+                    ["historyId"]= "7410025380879",
                     ["clientType"]= "MOBILE",
                     ["hasFreegame"]= 0,
+                    ["afterBalance"]= "1.64",
+                    ["beforeBalance"]= "0.64",
                     ["systemTakeWin"]= 0,
-                    ["lastModifyTime"]= "26-02-2024 22:25:14",
+                    ["lastModifyTime"]= "19-03-2024 23:15:47",
                     ["jackpotContribute"]= 0.0
                 }
             }
@@ -187,19 +187,19 @@ public class SearchGameTransactionDetailsUnitTest
 
         Assert.NotNull(results);
         Assert.NotEmpty(results);
-        Assert.Equal("7405918749700", results.ElementAt(0).RoundSeqNo);
-        Assert.Equal("7405918749700", results.ElementAt(0).HistoryId);
-        Assert.Equal("4ujgn5ht6x7m", results.ElementAt(0).PlayerId);
-        Assert.Equal(DateTimeOffset.Parse("2024-02-26T22:25:14-04:00"), results.ElementAt(0).GameDate);
-        Assert.Equal(2.0m, results.ElementAt(0).Bet);
-        Assert.Equal(4.0m, results.ElementAt(0).Win);
-        Assert.Equal(2.0m, results.ElementAt(0).Total);
+        Assert.Equal("7410025380879", results.ElementAt(0).RoundSeqNo);
+        Assert.Equal("7410025380879", results.ElementAt(0).HistoryId);
+        Assert.Equal("4ugyisoukd9p", results.ElementAt(0).PlayerId);
+        Assert.Equal(DateTimeOffset.Parse("2024-03-19T23:15:47-04:00"), results.ElementAt(0).GameDate);
+        Assert.Equal(0.25m, results.ElementAt(0).Bet);
+        Assert.Equal(1.25m, results.ElementAt(0).Win);
+        Assert.Equal(1.0m, results.ElementAt(0).Total);
         Assert.Equal("PP", results.ElementAt(0).Currency);
         Assert.Equal(0.0m, results.ElementAt(0).Jackpot);
         Assert.Equal(0.0m, results.ElementAt(0).JackpotContribute);
-        Assert.Equal(2.0m, results.ElementAt(0).Denom);
-        Assert.Equal(DateTimeOffset.Parse("2024-02-26T22:25:14-04:00"), results.ElementAt(0).LastModifyTime);
-        Assert.Equal("175.176.24.123", results.ElementAt(0).PlayerIp);
+        Assert.Equal(0.01m, results.ElementAt(0).Denom);
+        Assert.Equal(DateTimeOffset.Parse("2024-03-19T23:15:47-04:00"), results.ElementAt(0).LastModifyTime);
+        Assert.Equal("136.158.3.190", results.ElementAt(0).PlayerIp);
         Assert.Equal("MOBILE", results.ElementAt(0).ClientType);
         Assert.Equal(0, results.ElementAt(0).HasFreegame);
         Assert.Equal(0, results.ElementAt(0).HasGamble);
@@ -337,8 +337,8 @@ public class SearchGameTransactionDetailsUnitTest
         var aesKey = "831057181dd07807";
         var aesIV = "193a3159afebee65";
         var agent = "zf055gpi";
-        var startTime = DateTime.Parse("2023-09-19 11:30:00+08:00");
-        var endTime = DateTime.Parse("2023-09-19 11:40:00+08:00");
+        var startTime = DateTime.Parse("2024-03-20T11:10:00+08:00");
+        var endTime = DateTime.Parse("2024-03-20T11:20:00+08:00");
 
         var gameInterfaceSetting = Options.Create(new GameInterfaceSettingOptions()
         {
@@ -379,26 +379,26 @@ public class SearchGameTransactionDetailsUnitTest
             ["data"] = new JsonArray {
                 new JsonObject
                 {
-                    ["bet"]= -20.0,
-                    ["win"]= 520.0,
-                    ["denom"]= 2.0,
+                    ["bet"]= -1.2,
+                    ["win"]= 12.48,
+                    ["denom"]= 0.02,
                     ["gType"]= 0,
-                    ["mtype"]= 14042,
-                    ["seqNo"]= 7405912472192,
-                    ["total"]= 500.0,
+                    ["mtype"]= 14077,
+                    ["seqNo"]= 7410025192659,
+                    ["total"]= 11.28,
                     ["jackpot"]= 0.0,
-                    ["currency"]= "PP",
-                    ["gameDate"]= "26-02-2024 21:34:49",
-                    ["playerId"]= "4ume6i0bb37x",
-                    ["playerIp"]= "122.54.227.234",
-                    ["gambleBet"]= 0.0,
-                    ["hasGamble"]= 0,
-                    ["historyId"]= "7405912472192",
-                    ["clientType"]= "MOBILE",
+                    ["currency"]= "HK",
+                    ["gameDate"]= "19-03-2024 23:14:22",
+                    ["playerId"]= "4ukazt29act5",
+                    ["playerIp"]= "116.48.51.172",
+                    ["historyId"]= "7410025192659",
+                    ["clientType"]= "WEB",
                     ["hasFreegame"]= 1,
+                    ["afterBalance"]= "152.52",
+                    ["beforeBalance"]= "141.24",
                     ["systemTakeWin"]= 0,
-                    ["lastModifyTime"]= "26-02-2024 21:34:49",
-                    ["jackpotContribute"]= 0.0
+                    ["lastModifyTime"]= "19-03-2024 23:14:22",
+                    ["jackpotContribute"]=  0.0,
                 }
             }
         };
@@ -428,20 +428,20 @@ public class SearchGameTransactionDetailsUnitTest
 
         Assert.NotNull(results);
         Assert.NotEmpty(results);
-        Assert.Equal("7405912472192", results.ElementAt(0).RoundSeqNo);
-        Assert.Equal("7405912472192", results.ElementAt(0).HistoryId);
-        Assert.Equal("4ume6i0bb37x", results.ElementAt(0).PlayerId);
-        Assert.Equal(DateTimeOffset.Parse("2024-02-26T21:34:49-04:00"), results.ElementAt(0).GameDate);
-        Assert.Equal(20.0m, results.ElementAt(0).Bet);
-        Assert.Equal(520.0m, results.ElementAt(0).Win);
-        Assert.Equal(500.0m, results.ElementAt(0).Total);
-        Assert.Equal("PP", results.ElementAt(0).Currency);
+        Assert.Equal("7410025192659", results.ElementAt(0).RoundSeqNo);
+        Assert.Equal("7410025192659", results.ElementAt(0).HistoryId);
+        Assert.Equal("4ukazt29act5", results.ElementAt(0).PlayerId);
+        Assert.Equal(DateTimeOffset.Parse("2024-03-19T23:14:22-04:00"), results.ElementAt(0).GameDate);
+        Assert.Equal(1.2m, results.ElementAt(0).Bet);
+        Assert.Equal(12.48m, results.ElementAt(0).Win);
+        Assert.Equal(11.28m, results.ElementAt(0).Total);
+        Assert.Equal("HK", results.ElementAt(0).Currency);
         Assert.Equal(0.0m, results.ElementAt(0).Jackpot);
         Assert.Equal(0.0m, results.ElementAt(0).JackpotContribute);
-        Assert.Equal(2.0m, results.ElementAt(0).Denom);
-        Assert.Equal(DateTimeOffset.Parse("2024-02-26T21:34:49-04:00"), results.ElementAt(0).LastModifyTime);
-        Assert.Equal("122.54.227.234", results.ElementAt(0).PlayerIp);
-        Assert.Equal("MOBILE", results.ElementAt(0).ClientType);
+        Assert.Equal(0.02m, results.ElementAt(0).Denom);
+        Assert.Equal(DateTimeOffset.Parse("2024-03-19T23:14:22-04:00"), results.ElementAt(0).LastModifyTime);
+        Assert.Equal("116.48.51.172", results.ElementAt(0).PlayerIp);
+        Assert.Equal("WEB", results.ElementAt(0).ClientType);
         Assert.Equal(1, results.ElementAt(0).HasFreegame);
         Assert.Equal(0, results.ElementAt(0).HasGamble);
         Assert.Equal(0.0m, results.ElementAt(0).GambleBet);
@@ -457,8 +457,8 @@ public class SearchGameTransactionDetailsUnitTest
         var aesKey = "831057181dd07807";
         var aesIV = "193a3159afebee65";
         var agent = "zf055gpi";
-        var startTime = DateTime.Parse("2023-09-18 13:35:00+08:00");
-        var endTime = DateTime.Parse("2023-09-18 13:40:00+08:00");
+        var startTime = DateTime.Parse("2024-03-18T14:10:00-04:00");
+        var endTime = DateTime.Parse("2024-03-18T14:20:00-04:00");
 
         var gameInterfaceSetting = Options.Create(new GameInterfaceSettingOptions()
         {
@@ -499,23 +499,23 @@ public class SearchGameTransactionDetailsUnitTest
             ["data"] = new JsonArray {
                 new JsonObject
                 {
-                    ["bet"]= -12.0m,
-                    ["win"]= 9.5m,
+                    ["bet"]= -20.1m,
+                    ["win"]= 9.9m,
                     ["denom"]= 1.0m,
                     ["gType"]= 7,
-                    ["mtype"]= 7003,
-                    ["seqNo"]= 7405690178678,
-                    ["total"]= -2.5m,
-                    ["currency"]= "PP",
-                    ["gameDate"]= "25-02-2024 13:44:21",
-                    ["playerId"]= "4uicun5ssgu6",
-                    ["playerIp"]= "112.198.114.77",
+                    ["mtype"]= 7006,
+                    ["seqNo"]= 7409759453101,
+                    ["total"]= -10.2m,
+                    ["currency"]= "VN",
+                    ["gameDate"]= "18-03-2024 14:15:38",
+                    ["playerId"]= "4umj9i07xvdf",
+                    ["playerIp"]= "27.74.101.2",
                     ["roomType"]= 0,
-                    ["historyId"]= "7405690178678",
+                    ["historyId"]= "7409759453101",
                     ["clientType"]= "MOBILE",
-                    ["afterBalance"]= 1.3m,
-                    ["beforeBalance"]= 3.8m,
-                    ["lastModifyTime"]= "25-02-2024 13:44:21"
+                    ["afterBalance"]= 0.1m,
+                    ["beforeBalance"]= 10.3m,
+                    ["lastModifyTime"]= "18-03-2024 14:15:38"
                 }
             }
         };
@@ -545,19 +545,19 @@ public class SearchGameTransactionDetailsUnitTest
 
         Assert.NotNull(results);
         Assert.NotEmpty(results);
-        Assert.Equal("7405690178678", results.ElementAt(0).RoundSeqNo);
-        Assert.Equal("7405690178678", results.ElementAt(0).HistoryId);
-        Assert.Equal("4uicun5ssgu6", results.ElementAt(0).PlayerId);
-        Assert.Equal(DateTimeOffset.Parse("2024-02-25T13:44:21-04:00"), results.ElementAt(0).GameDate);
-        Assert.Equal(12.0m, results.ElementAt(0).Bet);
-        Assert.Equal(9.5m, results.ElementAt(0).Win);
-        Assert.Equal(-2.5m, results.ElementAt(0).Total);
-        Assert.Equal("PP", results.ElementAt(0).Currency);
+        Assert.Equal("7409759453101", results.ElementAt(0).RoundSeqNo);
+        Assert.Equal("7409759453101", results.ElementAt(0).HistoryId);
+        Assert.Equal("4umj9i07xvdf", results.ElementAt(0).PlayerId);
+        Assert.Equal(DateTimeOffset.Parse("2024-03-18T14:15:38-04:00"), results.ElementAt(0).GameDate);
+        Assert.Equal(20.1m, results.ElementAt(0).Bet);
+        Assert.Equal(9.9m, results.ElementAt(0).Win);
+        Assert.Equal(-10.2m, results.ElementAt(0).Total);
+        Assert.Equal("VN", results.ElementAt(0).Currency);
         Assert.Equal(0.0m, results.ElementAt(0).Jackpot);
         Assert.Equal(0.0m, results.ElementAt(0).JackpotContribute);
         Assert.Equal(1.0m, results.ElementAt(0).Denom);
-        Assert.Equal(DateTimeOffset.Parse("2024-02-25T13:44:21-04:00"), results.ElementAt(0).LastModifyTime);
-        Assert.Equal("112.198.114.77", results.ElementAt(0).PlayerIp);
+        Assert.Equal(DateTimeOffset.Parse("2024-03-18T14:15:38-04:00"), results.ElementAt(0).LastModifyTime);
+        Assert.Equal("27.74.101.2", results.ElementAt(0).PlayerIp);
         Assert.Equal("MOBILE", results.ElementAt(0).ClientType);
         Assert.Equal(0, results.ElementAt(0).HasFreegame);
         Assert.Equal(0, results.ElementAt(0).HasGamble);
