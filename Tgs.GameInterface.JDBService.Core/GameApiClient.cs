@@ -199,6 +199,7 @@ internal class GameApiClient : IGameApiClient
             {
                 continue;
             }
+
             yield return new GameDetailTransactionResp(
                 RoundSeqNo: transaction["roundSeqNo"]?.ToString() ?? transaction["historyId"]?.ToString() ?? transaction["seqNo"]!.ToString(),
                 HistoryId: transaction["historyId"]?.ToString() ?? transaction["seqNo"]!.ToString(),
@@ -271,6 +272,7 @@ internal class GameApiClient : IGameApiClient
             {
                 continue;
             }
+
             yield return new GameDetailTransactionResp(
                 RoundSeqNo: transaction["roundSeqNo"]?.ToString() ?? transaction["historyId"]?.ToString() ?? transaction["seqNo"]!.ToString(),
                 HistoryId: transaction["historyId"]?.ToString() ?? transaction["seqNo"]!.ToString(),
@@ -444,7 +446,7 @@ internal class GameApiClient : IGameApiClient
                     "Withdrawal",
                     cancellationToken)
                 .ConfigureAwait(false);
-        });
+        }).ConfigureAwait(false);
 
         var status = jsonNode["status"]!.ToString();
         var errText = jsonNode["err_text"]?.ToString();

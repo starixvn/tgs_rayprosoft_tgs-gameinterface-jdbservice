@@ -21,7 +21,7 @@ internal class LoggingInterceptor(
             _ = activity?.Start();
             logger.LogInformation("TraceId:{traceId} LogOn:{logOn}  MethodType:{methodType} Method:{method} Request:{request}", activity?.TraceId.ToString(), DateTime.Now.ToString("o"), methodType, method, request);
 
-            var response = await continuation(request, context);
+            var response = await continuation(request, context).ConfigureAwait(false);
 
             activity?.Stop();
             logger.LogInformation("TraceId:{traceId} LogOn:{logOn}  MethodType:{methodType} Method:{method} Spend:{spend:0.0000}ms Response:{response}", activity?.TraceId.ToString(), DateTime.Now.ToString("o"), methodType, method, activity?.Duration.TotalMilliseconds, response);

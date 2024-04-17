@@ -1,4 +1,5 @@
-﻿namespace Tgs.GameInterface.JDBService.Core.ApplicationServices;
+﻿using Tgs.GameInterface.JDBService.Core.ApplicationServices;
+namespace Tgs.GameInterface.JDBService.ViewModels;
 
 public record GameWagerResultViewModel(
     string PlayerCode,
