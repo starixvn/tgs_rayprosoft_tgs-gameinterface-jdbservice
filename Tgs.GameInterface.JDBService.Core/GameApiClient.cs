@@ -2,7 +2,6 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using Microsoft.Extensions.Internal;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Polly;
@@ -12,49 +11,34 @@ using Tgs.GameInterface.JDBService.Core.Models;
 
 namespace Tgs.GameInterface.JDBService.Core;
 
-internal class GameApiClient : IGameApiClient
+internal class GameApiClient(
+	IOptions<GameInterfaceSettingOptions> options,
+	ILogger<GameApiClient> logger,
+	HttpClient httpClient,
+	TimeProvider timeProvider,
+	IAesCryptography aesCryptography) : IGameApiClient
 {
-	private readonly GameInterfaceSettingOptions _gameInterfaceSetting;
-	private readonly ILogger<GameApiClient> _logger;
-	private readonly HttpClient _httpClient;
-	private readonly TimeProvider _timeProvider;
-	private readonly IAesCryptography _aesCryptography;
-	private readonly JsonSerializerOptions _jsonSerializerOptions;
+	private readonly GameInterfaceSettingOptions _gameInterfaceSetting = options.Value;
 
-	public GameApiClient(
-		IOptions<GameInterfaceSettingOptions> options,
-		ILogger<GameApiClient> logger,
-		HttpClient httpClient,
-		TimeProvider timeProvider,
-		IAesCryptography aesCryptography)
+	private readonly JsonSerializerOptions _jsonSerializerOptions = new()
 	{
-		_gameInterfaceSetting = options.Value;
-		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
-		_httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-		_timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
-		_aesCryptography = aesCryptography ?? throw new ArgumentNullException(nameof(aesCryptography));
-		_jsonSerializerOptions = new JsonSerializerOptions
-		{
-			PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-			NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowReadingFromString,
-			DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault,
-			Converters = {
-				new JDBDateTimeConverter()
-			}
-		};
-	}
+		PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+		NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowReadingFromString,
+		DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault,
+		Converters = { new JDBDateTimeConverter() }
+	};
 
 	public async ValueTask<bool> CheckCashTransferAsync(Uri apiUrl, string domain, string aesKey, string aesIV, string agent, string serialNo, CancellationToken cancellationToken = default)
 	{
 		var data = new
 		{
 			action = 55,
-			ts = _timeProvider.GetUtcNow().ToUnixTimeMilliseconds(),
+			ts = timeProvider.GetUtcNow().ToUnixTimeMilliseconds(),
 			parent = agent,
 			serialNo
 		};
 		var jsonString = JsonSerializer.Serialize(data);
-		var encryptedData = await _aesCryptography
+		var encryptedData = await aesCryptography
 				.GetAesEncryptAsync(
 					jsonString,
 					aesKey,
@@ -78,14 +62,14 @@ internal class GameApiClient : IGameApiClient
 		var data = new
 		{
 			action = 12,
-			ts = _timeProvider.GetUtcNow().ToUnixTimeMilliseconds(),
+			ts = timeProvider.GetUtcNow().ToUnixTimeMilliseconds(),
 			parent = agent,
 			uid = playerCode,
 			name = playerCode,
 			credit_allocated = 0
 		};
 		var jsonString = JsonSerializer.Serialize(data);
-		var encryptedData = await _aesCryptography
+		var encryptedData = await aesCryptography
 				.GetAesEncryptAsync(
 					jsonString,
 					aesKey,
@@ -114,7 +98,7 @@ internal class GameApiClient : IGameApiClient
 		var data = new
 		{
 			action = 19,
-			ts = _timeProvider.GetUtcNow().ToUnixTimeMilliseconds(),
+			ts = timeProvider.GetUtcNow().ToUnixTimeMilliseconds(),
 			parent = agent,
 			uid = playerCode,
 			serialNo,
@@ -122,7 +106,7 @@ internal class GameApiClient : IGameApiClient
 			amount
 		};
 		var jsonString = JsonSerializer.Serialize(data);
-		var encryptedData = await _aesCryptography
+		var encryptedData = await aesCryptography
 				.GetAesEncryptAsync(
 					jsonString,
 					aesKey,
@@ -157,13 +141,13 @@ internal class GameApiClient : IGameApiClient
 		var data = new
 		{
 			action = 29,
-			ts = _timeProvider.GetUtcNow().ToUnixTimeMilliseconds(),
+			ts = timeProvider.GetUtcNow().ToUnixTimeMilliseconds(),
 			parent = agent,
 			starttime = startTime.DatetimeConvertToString(),
 			endtime = endTime.DatetimeConvertToString()
 		};
 		var jsonString = JsonSerializer.Serialize(data);
-		var encryptedData = await _aesCryptography
+		var encryptedData = await aesCryptography
 				.GetAesEncryptAsync(
 					jsonString,
 					aesKey,
@@ -230,13 +214,13 @@ internal class GameApiClient : IGameApiClient
 		var data = new
 		{
 			action = 64,
-			ts = _timeProvider.GetUtcNow().ToUnixTimeMilliseconds(),
+			ts = timeProvider.GetUtcNow().ToUnixTimeMilliseconds(),
 			parent = agent,
 			starttime = startTime.DatetimeConvertToString(),
 			endtime = endTime.DatetimeConvertToString()
 		};
 		var jsonString = JsonSerializer.Serialize(data);
-		var encryptedData = await _aesCryptography
+		var encryptedData = await aesCryptography
 				.GetAesEncryptAsync(
 					jsonString,
 					aesKey,
@@ -303,12 +287,12 @@ internal class GameApiClient : IGameApiClient
 		var data = new
 		{
 			action = 15,
-			ts = _timeProvider.GetUtcNow().ToUnixTimeMilliseconds(),
+			ts = timeProvider.GetUtcNow().ToUnixTimeMilliseconds(),
 			parent = agent,
 			uid = playerCode
 		};
 		var jsonString = JsonSerializer.Serialize(data);
-		var encryptedData = await _aesCryptography
+		var encryptedData = await aesCryptography
 				.GetAesEncryptAsync(
 					jsonString,
 					aesKey,
@@ -338,7 +322,7 @@ internal class GameApiClient : IGameApiClient
 		var data = new
 		{
 			action = 11,
-			ts = _timeProvider.GetUtcNow().ToUnixTimeMilliseconds(),
+			ts = timeProvider.GetUtcNow().ToUnixTimeMilliseconds(),
 			uid = playerCode,
 			gType = gameType,
 			mType = machineType,
@@ -349,7 +333,7 @@ internal class GameApiClient : IGameApiClient
 			isShowDollarSign = true
 		};
 		var jsonString = JsonSerializer.Serialize(data);
-		var encryptedData = await _aesCryptography
+		var encryptedData = await aesCryptography
 				.GetAesEncryptAsync(
 					jsonString,
 					aesKey,
@@ -380,12 +364,12 @@ internal class GameApiClient : IGameApiClient
 		var data = new
 		{
 			action = 17,
-			ts = _timeProvider.GetUtcNow().ToUnixTimeMilliseconds(),
+			ts = timeProvider.GetUtcNow().ToUnixTimeMilliseconds(),
 			parent = agent,
 			uid = playerCode
 		};
 		var jsonString = JsonSerializer.Serialize(data);
-		var encryptedData = await _aesCryptography
+		var encryptedData = await aesCryptography
 				.GetAesEncryptAsync(
 					jsonString,
 					aesKey,
@@ -397,7 +381,7 @@ internal class GameApiClient : IGameApiClient
 				apiUrl,
 				domain,
 				encryptedData,
-				"KickPlayer",
+				"PlayerLogout",
 				cancellationToken)
 			.ConfigureAwait(false);
 
@@ -416,14 +400,14 @@ internal class GameApiClient : IGameApiClient
 					r["status"]!.ToString() == "6901")
 					.WaitAndRetryAsync(_gameInterfaceSetting.WithdrawalRetryCount,
 						retryAttempt => TimeSpan.FromSeconds(_gameInterfaceSetting.WithdrawalIntervalSeconds),
-						(response, retryTime, context) => _logger.LogWarning("Response:{response}", JsonSerializer.Serialize(response)));
+						(response, retryTime, context) => logger.LogWarning("Response:{response}", JsonSerializer.Serialize(response)));
 
 		var jsonNode = await retryPolicy.ExecuteAsync(async () =>
 		{
 			var data = new
 			{
 				action = 19,
-				ts = _timeProvider.GetUtcNow().ToUnixTimeMilliseconds(),
+				ts = timeProvider.GetUtcNow().ToUnixTimeMilliseconds(),
 				parent = agent,
 				uid = playerCode,
 				serialNo,
@@ -431,7 +415,7 @@ internal class GameApiClient : IGameApiClient
 				amount = -amount
 			};
 			var jsonString = JsonSerializer.Serialize(data);
-			var encryptedData = await _aesCryptography
+			var encryptedData = await aesCryptography
 					.GetAesEncryptAsync(
 						jsonString,
 						aesKey,
@@ -462,6 +446,75 @@ internal class GameApiClient : IGameApiClient
 				Resp: jsonNode.ToJsonString());
 	}
 
+	public async ValueTask<bool> PlayerOnlineAsync(Uri apiUrl, string domain, string aesKey, string aesIV, string agent, string playerCode, CancellationToken cancellationToken = default)
+	{
+		var request = new
+		{
+			action = 52,
+			ts = timeProvider.GetUtcNow().ToUnixTimeMilliseconds(),
+			parent = agent,
+			uid = playerCode,
+		};
+		var jsonString = JsonSerializer.Serialize(request);
+		var encryptedData = await aesCryptography.GetAesEncryptAsync(
+			jsonString,
+			aesKey,
+			aesIV,
+			cancellationToken)
+		.ConfigureAwait(false);
+
+		var jsonNode = await PostAsync(
+			apiUrl,
+			domain,
+			encryptedData,
+			"PlayerOnline",
+			cancellationToken)
+			.ConfigureAwait(false);
+
+		var status = jsonNode["status"]!.ToString();
+
+		if (status is not "0000" and not "7505")
+		{
+			var errText = jsonNode["err_text"]?.ToString() ?? string.Empty;
+			throw new GameProvisioningErrorException(status, errText);
+		}
+
+		return status is "0000";
+	}
+
+	public async ValueTask PlayerLogoutAllAsync(Uri apiUrl, string domain, string aesKey, string aesIV, string agent, CancellationToken cancellationToken = default)
+
+	{
+		var data = new
+		{
+			action = 58,
+			ts = timeProvider.GetUtcNow().ToUnixTimeMilliseconds(),
+			parent = agent
+		};
+		var jsonString = JsonSerializer.Serialize(data);
+		var encryptedData = await aesCryptography.GetAesEncryptAsync(
+			jsonString,
+			aesKey,
+			aesIV,
+			cancellationToken)
+			.ConfigureAwait(false);
+
+		var jsonNode = await PostAsync(
+			apiUrl,
+			domain,
+			encryptedData,
+			"PlayerLogoutAll",
+			cancellationToken)
+			.ConfigureAwait(false);
+
+		var status = jsonNode["status"]!.ToString();
+		var errText = jsonNode["err_text"]?.ToString();
+		if (status is not "0000")
+		{
+			throw new GameProvisioningErrorException(status, errText ?? string.Empty);
+		}
+	}
+
 	private async ValueTask<JsonNode> PostAsync(Uri apiUrl, string domain, string encryptedData, string action, CancellationToken cancellationToken = default)
 	{
 		var logPrefix = $"{nameof(GameApiClient)}.{action}".ToLower();
@@ -482,7 +535,7 @@ internal class GameApiClient : IGameApiClient
 		var sw = Stopwatch.StartNew();
 
 		var content = new FormUrlEncodedContent(parameters);
-		var httpResponseMessage = await _httpClient
+		var httpResponseMessage = await httpClient
 				.PostAsync(
 					url,
 					content,
@@ -517,48 +570,10 @@ internal class GameApiClient : IGameApiClient
 			RecordedOn = DateTimeOffset.UtcNow
 		};
 
-		_logger.LogInformation("{JsonSerializer.Serialize(apiLogEvent)}", JsonSerializer.Serialize(apiLogEvent));
+		logger.LogInformation("{JsonSerializer.Serialize(apiLogEvent)}", JsonSerializer.Serialize(apiLogEvent));
 
 		_ = httpResponseMessage.EnsureSuccessStatusCode();
 
 		return JsonNode.Parse(responseMessage)!;
-	}
-
-	public async ValueTask<bool> PlayerOnlineAsync(Uri apiUrl, string domain, string aesKey, string aesIV, string agent, string playerCode, CancellationToken cancellationToken = default)
-	{
-		var request = new
-		{
-			action = 52,
-			ts = _timeProvider.GetUtcNow().ToUnixTimeMilliseconds(),
-			parent = agent,
-			uid = playerCode,
-		};
-		var jsonString = JsonSerializer.Serialize(request);
-		var encryptedData = await _aesCryptography.GetAesEncryptAsync(
-			jsonString,
-			aesKey,
-			aesIV,
-			cancellationToken)
-		.ConfigureAwait(false);
-
-		var jsonNode = await PostAsync(
-			apiUrl,
-			domain,
-			encryptedData,
-			"PlayerOnline",
-			cancellationToken)
-			.ConfigureAwait(false);
-
-		var status = jsonNode["status"]!.ToString();
-
-		if (status is not "0000")
-		{
-			var errText = jsonNode["err_text"]?.ToString() ?? string.Empty;
-			throw new GameProvisioningErrorException(status, errText);
-		}
-
-		var data = jsonNode["data"]!.ToString();
-
-		return data is not null;
 	}
 }

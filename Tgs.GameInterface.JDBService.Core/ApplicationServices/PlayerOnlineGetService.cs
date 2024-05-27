@@ -1,6 +1,7 @@
 ﻿using Tgs.ServiceUtility;
 
 namespace Tgs.GameInterface.JDBService.Core.ApplicationServices;
+
 internal class PlayerOnlineGetService(
 	IGameApiClient client) : IGetService<PlayerOnlineQuery, bool>
 {

@@ -2,7 +2,7 @@
 
 public class GameInterfaceSettingOptions
 {
-    public int WithdrawalRetryCount { get; set; }
+	public int WithdrawalRetryCount { get; set; }
 
-    public double WithdrawalIntervalSeconds { get; set; }
+	public double WithdrawalIntervalSeconds { get; set; }
 }
