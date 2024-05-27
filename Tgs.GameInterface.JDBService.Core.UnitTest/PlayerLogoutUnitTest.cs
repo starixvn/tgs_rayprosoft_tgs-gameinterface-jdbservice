@@ -8,7 +8,7 @@ using RichardSzalay.MockHttp;
 
 namespace Tgs.GameInterface.JDBService.Core.UnitTest;
 
-public class KickOutPlayerUnitTest
+public class PlayerLogoutUnitTest
 {
     [Fact]
     public async Task Normal_Process()
@@ -26,12 +26,12 @@ public class KickOutPlayerUnitTest
             WithdrawalIntervalSeconds = 1
         });
         var fakeLog = NullLogger<GameApiClient>.Instance;
-        var fakeAesSystemClock = Substitute.For<ISystemClock>();
+        var fakeTimeProvider = Substitute.For<TimeProvider>();
         var fakeAesCryptography = Substitute.For<IAesCryptography>();
 
         var currentTime = DateTimeOffset.UtcNow;
 
-        _ = fakeAesSystemClock.UtcNow.Returns(currentTime);
+        _ = fakeTimeProvider.GetUtcNow().Returns(currentTime);
 
         var encryptedData = Guid.NewGuid().ToString("N");
         var data = new
@@ -60,10 +60,10 @@ public class KickOutPlayerUnitTest
             gameInterfaceSetting,
             fakeLog,
             fakeHttpClient,
-            fakeAesSystemClock,
+            fakeTimeProvider,
             fakeAesCryptography);
 
-        await client.KickOutPlayerAsync(
+        await client.PlayerLogoutAsync(
             apiUrl: apiUrl,
             domain: domain,
             aesKey: aesKey,

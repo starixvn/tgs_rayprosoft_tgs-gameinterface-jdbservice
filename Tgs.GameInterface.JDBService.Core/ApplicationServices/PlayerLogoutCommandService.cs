@@ -2,10 +2,10 @@
 
 namespace Tgs.GameInterface.JDBService.Core.ApplicationServices;
 
-internal class PlayerKickCommandService(IGameApiClient client) : ICommandService<PlayerKickCommand>
+internal class PlayerLogoutCommandService(IGameApiClient client) : ICommandService<PlayerLogoutCommand>
 {
-    public ValueTask ExecuteAsync(PlayerKickCommand command, CancellationToken cancellationToken = default)
-        => client.KickOutPlayerAsync(
+    public ValueTask ExecuteAsync(PlayerLogoutCommand command, CancellationToken cancellationToken = default)
+        => client.PlayerLogoutAsync(
             apiUrl: command.ApiUrl,
             domain: command.Domain,
             aesKey: command.AesKey,
