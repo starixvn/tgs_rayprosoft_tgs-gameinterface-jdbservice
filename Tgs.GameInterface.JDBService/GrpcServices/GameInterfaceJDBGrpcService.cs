@@ -10,7 +10,7 @@ public class GameInterfaceJDBGrpcService(
     ILogger<GameInterfaceJDBGrpcService> logger,
     IGetService<PlayerBalanceQuery, PlayerBalanceResult> playerBalanceService,
     ICommandService<PlayerCreateCommand> PlayerCreateService,
-    ICommandService<PlayerKickCommand> playerKickService,
+    ICommandService<PlayerLogoutCommand> playerKickService,
     IGetService<FundInQuery, FundResult> fundInService,
     IGetService<FundOutQuery, FundResult> fundOutService,
     IGetService<FundStatusQuery, bool> fundStatusService,
@@ -264,7 +264,7 @@ public class GameInterfaceJDBGrpcService(
 
     public override async Task<BaseReply> PlayerKick(PlayerKickRequest request, ServerCallContext context)
     {
-        var command = new PlayerKickCommand(
+        var command = new PlayerLogoutCommand(
         new Uri(request.ApiUrl),
         request.Domain,
         request.AesKey,

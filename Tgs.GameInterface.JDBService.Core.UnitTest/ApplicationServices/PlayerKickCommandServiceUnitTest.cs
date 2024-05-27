@@ -10,7 +10,7 @@ public class PlayerKickCommandServiceUnitTest
     {
         var fakeClient = Substitute.For<IGameApiClient>();
 
-        var command = new PlayerKickCommand(
+        var command = new PlayerLogoutCommand(
             ApiUrl: new Uri("http://localhost/"),
             Domain: "ZF",
             AesKey: "831057181dd07807",
@@ -18,14 +18,14 @@ public class PlayerKickCommandServiceUnitTest
             Agent: "zf055gpi",
             PlayerCode: "4ucmqplxhfoe");
 
-        var service = new PlayerKickCommandService(
+        var service = new PlayerLogoutCommandService(
             fakeClient);
 
         await service.ExecuteAsync(command: command);
 
         _ = fakeClient
             .Received(1)
-            .KickOutPlayerAsync(
+            .PlayerLogoutAsync(
             Arg.Is(command.ApiUrl),
             Arg.Is(command.Domain),
             Arg.Is(command.AesKey),

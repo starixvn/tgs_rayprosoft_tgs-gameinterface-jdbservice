@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using System.Text.Json;
-using Microsoft.Extensions.Internal;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NSubstitute;
@@ -10,131 +9,131 @@ namespace Tgs.GameInterface.JDBService.Core.UnitTest;
 
 public class CheckCashTransferUnitTest
 {
-    [Fact]
-    public async Task Normal_Process()
-    {
-        var apiUrl = new Uri("http://localhost/");
-        var domain = "ZF";
-        var aesKey = "831057181dd07807";
-        var aesIV = "193a3159afebee65";
-        var agent = "zf055gpi";
-        var serialNo = "1662442853";
+	[Fact]
+	public async Task Normal_Process()
+	{
+		var apiUrl = new Uri("http://localhost/");
+		var domain = "ZF";
+		var aesKey = "831057181dd07807";
+		var aesIV = "193a3159afebee65";
+		var agent = "zf055gpi";
+		var serialNo = "1662442853";
 
-        var gameInterfaceSetting = Options.Create(new GameInterfaceSettingOptions()
-        {
-            WithdrawalRetryCount = 1,
-            WithdrawalIntervalSeconds = 1
-        });
-        var fakeLog = NullLogger<GameApiClient>.Instance;
-        var fakeAesSystemClock = Substitute.For<ISystemClock>();
-        var fakeAesCryptography = Substitute.For<IAesCryptography>();
+		var gameInterfaceSetting = Options.Create(new GameInterfaceSettingOptions()
+		{
+			WithdrawalRetryCount = 1,
+			WithdrawalIntervalSeconds = 1
+		});
+		var fakeLog = NullLogger<GameApiClient>.Instance;
+		var fakeTimeProvider = Substitute.For<TimeProvider>();
+		var fakeAesCryptography = Substitute.For<IAesCryptography>();
 
-        var currentTime = DateTimeOffset.UtcNow;
+		var currentTime = DateTimeOffset.UtcNow;
 
-        _ = fakeAesSystemClock.UtcNow.Returns(currentTime);
+		_ = fakeTimeProvider.GetUtcNow().Returns(currentTime);
 
-        var encryptedData = Guid.NewGuid().ToString("N");
-        var data = new
-        {
-            action = 55,
-            ts = currentTime.ToUnixTimeMilliseconds(),
-            parent = agent,
-            serialNo
-        };
-        var jsonString = JsonSerializer.Serialize(data);
-        _ = fakeAesCryptography.GetAesEncryptAsync(
-            Arg.Is(jsonString),
-            Arg.Is(aesKey),
-            Arg.Is(aesIV)).Returns(encryptedData);
+		var encryptedData = Guid.NewGuid().ToString("N");
+		var data = new
+		{
+			action = 55,
+			ts = currentTime.ToUnixTimeMilliseconds(),
+			parent = agent,
+			serialNo
+		};
+		var jsonString = JsonSerializer.Serialize(data);
+		_ = fakeAesCryptography.GetAesEncryptAsync(
+			Arg.Is(jsonString),
+			Arg.Is(aesKey),
+			Arg.Is(aesIV)).Returns(encryptedData);
 
-        var url = new Uri(apiUrl, "/apiRequest.do");
+		var url = new Uri(apiUrl, "/apiRequest.do");
 
-        var handler = new MockHttpMessageHandler();
-        _ = handler
-            .Expect(HttpMethod.Post, url.ToString())
-            .Respond(HttpStatusCode.OK, new StringContent("{\"status\":\"0000\",\"data\":[{\"uid\":\"4ucmqplxhfoe\",\"action\":\"deposit\",\"amount\":1,\"plsBalance\":1,\"date\":\"06-09-2022 04:20:47\",\"pid\":4960027,\"remark\":\"\",\"afterBalance\":2}]}"));
+		var handler = new MockHttpMessageHandler();
+		_ = handler
+			.Expect(HttpMethod.Post, url.ToString())
+			.Respond(HttpStatusCode.OK, new StringContent("{\"status\":\"0000\",\"data\":[{\"uid\":\"4ucmqplxhfoe\",\"action\":\"deposit\",\"amount\":1,\"plsBalance\":1,\"date\":\"06-09-2022 04:20:47\",\"pid\":4960027,\"remark\":\"\",\"afterBalance\":2}]}"));
 
-        var fakeHttpClient = handler.ToHttpClient();
+		var fakeHttpClient = handler.ToHttpClient();
 
-        var client = new GameApiClient(
-            gameInterfaceSetting,
-            fakeLog,
-            fakeHttpClient,
-            fakeAesSystemClock,
-            fakeAesCryptography);
+		var client = new GameApiClient(
+			gameInterfaceSetting,
+			fakeLog,
+			fakeHttpClient,
+			fakeTimeProvider,
+			fakeAesCryptography);
 
-        var actual = await client.CheckCashTransferAsync(
-            apiUrl: apiUrl,
-            domain: domain,
-            aesKey: aesKey,
-            aesIV: aesIV,
-            agent: agent,
-            serialNo: serialNo);
+		var actual = await client.CheckCashTransferAsync(
+			apiUrl: apiUrl,
+			domain: domain,
+			aesKey: aesKey,
+			aesIV: aesIV,
+			agent: agent,
+			serialNo: serialNo);
 
-        Assert.True(actual);
-    }
+		Assert.True(actual);
+	}
 
-    [Fact]
-    public async Task Status_9015_Exception()
-    {
-        var apiUrl = new Uri("http://localhost/");
-        var domain = "ZF";
-        var aesKey = "831057181dd07807";
-        var aesIV = "193a3159afebee65";
-        var agent = "zf055gpi";
-        var serialNo = "1662442853";
+	[Fact]
+	public async Task Status_9015_Exception()
+	{
+		var apiUrl = new Uri("http://localhost/");
+		var domain = "ZF";
+		var aesKey = "831057181dd07807";
+		var aesIV = "193a3159afebee65";
+		var agent = "zf055gpi";
+		var serialNo = "1662442853";
 
-        var gameInterfaceSetting = Options.Create(new GameInterfaceSettingOptions()
-        {
-            WithdrawalRetryCount = 1,
-            WithdrawalIntervalSeconds = 1
-        });
-        var fakeLog = NullLogger<GameApiClient>.Instance;
-        var fakeAesSystemClock = Substitute.For<ISystemClock>();
-        var fakeAesCryptography = Substitute.For<IAesCryptography>();
+		var gameInterfaceSetting = Options.Create(new GameInterfaceSettingOptions()
+		{
+			WithdrawalRetryCount = 1,
+			WithdrawalIntervalSeconds = 1
+		});
+		var fakeLog = NullLogger<GameApiClient>.Instance;
+		var fakeTimeProvider = Substitute.For<TimeProvider>();
+		var fakeAesCryptography = Substitute.For<IAesCryptography>();
 
-        var currentTime = DateTimeOffset.UtcNow;
+		var currentTime = DateTimeOffset.UtcNow;
 
-        _ = fakeAesSystemClock.UtcNow.Returns(currentTime);
+		_ = fakeTimeProvider.GetUtcNow().Returns(currentTime);
 
-        var encryptedData = Guid.NewGuid().ToString("N");
-        var data = new
-        {
-            action = 55,
-            ts = currentTime.ToUnixTimeMilliseconds(),
-            parent = agent,
-            serialNo
-        };
-        var jsonString = JsonSerializer.Serialize(data);
-        _ = fakeAesCryptography.GetAesEncryptAsync(
-            Arg.Is(jsonString),
-            Arg.Is(aesKey),
-            Arg.Is(aesIV)).Returns(encryptedData);
+		var encryptedData = Guid.NewGuid().ToString("N");
+		var data = new
+		{
+			action = 55,
+			ts = currentTime.ToUnixTimeMilliseconds(),
+			parent = agent,
+			serialNo
+		};
+		var jsonString = JsonSerializer.Serialize(data);
+		_ = fakeAesCryptography.GetAesEncryptAsync(
+			Arg.Is(jsonString),
+			Arg.Is(aesKey),
+			Arg.Is(aesIV)).Returns(encryptedData);
 
-        var url = new Uri(apiUrl, "/apiRequest.do");
+		var url = new Uri(apiUrl, "/apiRequest.do");
 
-        var handler = new MockHttpMessageHandler();
-        _ = handler
-            .Expect(HttpMethod.Post, url.ToString())
-            .Respond(HttpStatusCode.OK, new StringContent("{\"status\":\"9015\",\"err_text\":\"Data does not exist.\"}"));
+		var handler = new MockHttpMessageHandler();
+		_ = handler
+			.Expect(HttpMethod.Post, url.ToString())
+			.Respond(HttpStatusCode.OK, new StringContent("{\"status\":\"9015\",\"err_text\":\"Data does not exist.\"}"));
 
-        var fakeHttpClient = handler.ToHttpClient();
+		var fakeHttpClient = handler.ToHttpClient();
 
-        var client = new GameApiClient(
-            gameInterfaceSetting,
-            fakeLog,
-            fakeHttpClient,
-            fakeAesSystemClock,
-            fakeAesCryptography);
+		var client = new GameApiClient(
+			gameInterfaceSetting,
+			fakeLog,
+			fakeHttpClient,
+			fakeTimeProvider,
+			fakeAesCryptography);
 
-        var actual = await client.CheckCashTransferAsync(
-            apiUrl: apiUrl,
-            domain: domain,
-            aesKey: aesKey,
-            aesIV: aesIV,
-            agent: agent,
-            serialNo: serialNo);
+		var actual = await client.CheckCashTransferAsync(
+			apiUrl: apiUrl,
+			domain: domain,
+			aesKey: aesKey,
+			aesIV: aesIV,
+			agent: agent,
+			serialNo: serialNo);
 
-        Assert.False(actual);
-    }
+		Assert.False(actual);
+	}
 }
