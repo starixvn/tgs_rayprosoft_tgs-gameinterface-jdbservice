@@ -2,7 +2,7 @@
 
 public class EncryptedDataEmptyException : Exception
 {
-    public EncryptedDataEmptyException() : base("Encrypted data is empty")
-    {
-    }
+	public EncryptedDataEmptyException() : base("Encrypted data is empty")
+	{
+	}
 }

@@ -22,5 +22,7 @@ public interface IGameApiClient
 
 	ValueTask PlayerLogoutAsync(Uri apiUrl, string domain, string aesKey, string aesIV, string agent, string playerCode, CancellationToken cancellationToken = default);
 
+	ValueTask PlayerLogoutAllAsync(Uri apiUrl, string domain, string aesKey, string aesIV, string agent, CancellationToken cancellationToken = default);
+
 	ValueTask<TransactionResp> WithdrawalAsync(Uri apiUrl, string domain, string aesKey, string aesIV, string agent, string playerCode, string serialNo, decimal amount, CancellationToken cancellationToken = default);
 }

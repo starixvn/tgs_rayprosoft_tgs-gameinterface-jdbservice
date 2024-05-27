@@ -13,6 +13,9 @@ service GameInterfaceJDBService {
   rpc PlayerBalance (PlayerBalanceRequest) returns (PlayerBalanceReply);
   rpc PlayerCreate (PlayerCreateRequest) returns (BaseReply);
   rpc PlayerKick (PlayerKickRequest) returns (BaseReply);
+  rpc PlayerLogout (PlayerLogoutRequest) returns (BaseReply);
+  rpc PlayerLogoutAll (PlayerLogoutAllRequest) returns (BaseReply);
+  rpc PlayerOnline (PlayerOnlineRequest) returns (PlayerOnlineReply);
   rpc FundOut(FundRequest) returns (FundReply);
   rpc FundIn (FundRequest) returns (FundReply);
   rpc FundStatus(FundStatusRequest) returns (FundStatusReply);
@@ -42,6 +45,32 @@ message PlayerCreateRequest {
 }
 
 message PlayerKickRequest {
+	string api_url = 1;
+	string domain = 2;
+	string aes_key = 3;
+	string aes_i_v = 4;
+	string agent = 5;
+	string player_code= 6;
+}
+
+message PlayerLogoutRequest {
+	string api_url = 1;
+	string domain = 2;
+	string aes_key = 3;
+	string aes_i_v = 4;
+	string agent = 5;
+	string player_code= 6;
+}
+
+message PlayerLogoutAllRequest {
+	string api_url = 1;
+	string domain = 2;
+	string aes_key = 3;
+	string aes_i_v = 4;
+	string agent = 5;
+}
+
+message PlayerOnlineRequest {
 	string api_url = 1;
 	string domain = 2;
 	string aes_key = 3;
@@ -146,6 +175,10 @@ message GameWagerInfo {
 	phoenix.protobuf.DecimalValue settle = 10;
 	phoenix.protobuf.DecimalValue win_loss = 11;	
 	string additional_data = 12;
+}
+
+message PlayerOnlineReply {
+	bool online = 1;
 }
 
 message CheckingServiceReply{

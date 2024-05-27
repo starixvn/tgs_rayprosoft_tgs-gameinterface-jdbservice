@@ -7,173 +7,173 @@ namespace Tgs.GameInterface.JDBService.Core.UnitTest.ApplicationServices;
 
 public class GameWagerQueryServiceUnitTest
 {
-    [Fact]
-    public async Task Normal_Process()
-    {
-        var fakeClient = Substitute.For<IGameApiClient>();
+	[Fact]
+	public async Task Normal_Process()
+	{
+		var fakeClient = Substitute.For<IGameApiClient>();
 
-        var query = new GameWagerQuery(
-            ApiUrl: new Uri("http://localhost/"),
-            Domain: "ZF",
-            AesKey: "831057181dd07807",
-            AesIV: "193a3159afebee65",
-            Agent: "zf055gpi",
-            StartTime: DateTime.Now.AddMinutes(-10),
-            EndTime: DateTime.Now);
+		var query = new GameWagerQuery(
+			ApiUrl: new Uri("http://localhost/"),
+			Domain: "ZF",
+			AesKey: "831057181dd07807",
+			AesIV: "193a3159afebee65",
+			Agent: "zf055gpi",
+			StartTime: DateTime.Now.AddMinutes(-10),
+			EndTime: DateTime.Now);
 
-        var sysUtcNow = DateTimeOffset.UtcNow;
-        var resp = new GameDetailTransactionResp[]
-            {
-                new(
-                    RoundSeqNo:sysUtcNow.ToUnixTimeMilliseconds().ToString(),
-                    HistoryId: sysUtcNow.ToUnixTimeMilliseconds().ToString(),
-                    PlayerId:"test",
-                    GameType:1,
-                    MachineType:0,
-                    GameDate:sysUtcNow,
-                    Bet:10,
-                    Win:20,
-                    Total:10,
-                    Currency:"PP",
-                    Jackpot:0.0m,
-                    JackpotContribute:0.0m,
-                    Denom:0.1m,
-                    LastModifyTime:sysUtcNow,
-                    PlayerIp:"::1",
-                    ClientType:"PC",
-                    HasFreegame:0,
-                    HasGamble:0,
-                    GambleBet:0,
-                    SystemTakeWin:0,
-                    AdditionalData:new JsonObject
-                    {
-                        ["historyId"] = sysUtcNow.ToUnixTimeMilliseconds()
-                    }.ToJsonString())
-            };
-        _ = fakeClient
-            .SearchGameTransactionDetailsAsync(
-            Arg.Is(query.ApiUrl),
-            Arg.Is(query.Domain),
-            Arg.Is(query.AesKey),
-            Arg.Is(query.AesIV),
-            Arg.Is(query.Agent),
-            Arg.Is(query.StartTime),
-            Arg.Is(query.EndTime),
-            Arg.Any<CancellationToken>()
-            ).Returns(resp.ToAsyncEnumerable());
+		var sysUtcNow = DateTimeOffset.UtcNow;
+		var resp = new GameDetailTransactionResp[]
+			{
+				new(
+					RoundSeqNo:sysUtcNow.ToUnixTimeMilliseconds().ToString(),
+					HistoryId: sysUtcNow.ToUnixTimeMilliseconds().ToString(),
+					PlayerId:"test",
+					GameType:1,
+					MachineType:0,
+					GameDate:sysUtcNow,
+					Bet:10,
+					Win:20,
+					Total:10,
+					Currency:"PP",
+					Jackpot:0.0m,
+					JackpotContribute:0.0m,
+					Denom:0.1m,
+					LastModifyTime:sysUtcNow,
+					PlayerIp:"::1",
+					ClientType:"PC",
+					HasFreegame:0,
+					HasGamble:0,
+					GambleBet:0,
+					SystemTakeWin:0,
+					AdditionalData:new JsonObject
+					{
+						["historyId"] = sysUtcNow.ToUnixTimeMilliseconds()
+					}.ToJsonString())
+			};
+		_ = fakeClient
+			.SearchGameTransactionDetailsAsync(
+			Arg.Is(query.ApiUrl),
+			Arg.Is(query.Domain),
+			Arg.Is(query.AesKey),
+			Arg.Is(query.AesIV),
+			Arg.Is(query.Agent),
+			Arg.Is(query.StartTime),
+			Arg.Is(query.EndTime),
+			Arg.Any<CancellationToken>()
+			).Returns(resp.ToAsyncEnumerable());
 
-        var service = new GameWagerQueryService(
-            fakeClient);
+		var service = new GameWagerQueryService(
+			fakeClient);
 
-        var actual = await service.QueryAsync(
-            query: query)
-            .ToArrayAsync()
-            ?? Enumerable.Empty<GameWagerResult>();
+		var actual = await service.QueryAsync(
+			query: query)
+			.ToArrayAsync()
+			?? Enumerable.Empty<GameWagerResult>();
 
-        Assert.Equal(resp.ToArray().ElementAt(0).PlayerId, actual.ElementAt(0).PlayerCode);
-        Assert.Equal(resp.ToArray().ElementAt(0).HistoryId.ToString(), actual.ElementAt(0).ExternalWagerId);
-        Assert.Equal($"{resp.ToArray().ElementAt(0).GameType}_{resp.ToArray().ElementAt(0).MachineType}", actual.ElementAt(0).ExternalGameId);
-        Assert.False(actual.ElementAt(0).FreeGameState);
-        Assert.False(actual.ElementAt(0).GambleState);
-        Assert.Equal(resp.ToArray().ElementAt(0).GameDate, actual.ElementAt(0).ExternalCreatedOn);
-        Assert.Equal(resp.ToArray().ElementAt(0).LastModifyTime, actual.ElementAt(0).ExternalClosedOn);
-        Assert.Equal(resp.ToArray().ElementAt(0).Bet, actual.ElementAt(0).Bet);
-        Assert.Equal(resp.ToArray().ElementAt(0).Total, actual.ElementAt(0).WinLoss);
-        Assert.Equal(resp.ToArray().ElementAt(0).Win, actual.ElementAt(0).Settle);
-        Assert.Equal(resp.ToArray().ElementAt(0).AdditionalData, actual.ElementAt(0).AdditionalData);
-    }
+		Assert.Equal(resp.ToArray().ElementAt(0).PlayerId, actual.ElementAt(0).PlayerCode);
+		Assert.Equal(resp.ToArray().ElementAt(0).HistoryId.ToString(), actual.ElementAt(0).ExternalWagerId);
+		Assert.Equal($"{resp.ToArray().ElementAt(0).GameType}_{resp.ToArray().ElementAt(0).MachineType}", actual.ElementAt(0).ExternalGameId);
+		Assert.False(actual.ElementAt(0).FreeGameState);
+		Assert.False(actual.ElementAt(0).GambleState);
+		Assert.Equal(resp.ToArray().ElementAt(0).GameDate, actual.ElementAt(0).ExternalCreatedOn);
+		Assert.Equal(resp.ToArray().ElementAt(0).LastModifyTime, actual.ElementAt(0).ExternalClosedOn);
+		Assert.Equal(resp.ToArray().ElementAt(0).Bet, actual.ElementAt(0).Bet);
+		Assert.Equal(resp.ToArray().ElementAt(0).Total, actual.ElementAt(0).WinLoss);
+		Assert.Equal(resp.ToArray().ElementAt(0).Win, actual.ElementAt(0).Settle);
+		Assert.Equal(resp.ToArray().ElementAt(0).AdditionalData, actual.ElementAt(0).AdditionalData);
+	}
 
-    [Fact]
-    public async Task Freegame()
-    {
-        var fakeClient = Substitute.For<IGameApiClient>();
+	[Fact]
+	public async Task Freegame()
+	{
+		var fakeClient = Substitute.For<IGameApiClient>();
 
-        var query = new GameWagerQuery(
-            ApiUrl: new Uri("http://localhost/"),
-            Domain: "ZF",
-            AesKey: "831057181dd07807",
-            AesIV: "193a3159afebee65",
-            Agent: "zf055gpi",
-            StartTime: DateTime.Now.AddMinutes(-10),
-            EndTime: DateTime.Now);
+		var query = new GameWagerQuery(
+			ApiUrl: new Uri("http://localhost/"),
+			Domain: "ZF",
+			AesKey: "831057181dd07807",
+			AesIV: "193a3159afebee65",
+			Agent: "zf055gpi",
+			StartTime: DateTime.Now.AddMinutes(-10),
+			EndTime: DateTime.Now);
 
-        var sysUtcNow = DateTimeOffset.UtcNow;
-        var resp = new GameDetailTransactionResp[]
-            {
-                new(
-                    RoundSeqNo:sysUtcNow.ToUnixTimeMilliseconds().ToString(),
-                    HistoryId: sysUtcNow.ToUnixTimeMilliseconds().ToString(),
-                    PlayerId:"4ugse0rsnufp",
-                    GameType:0,
-                    MachineType:15010,
-                    GameDate:sysUtcNow,
-                    Bet:0.5m,
-                    Win:65.5m,
-                    Total:65.0m,
-                    Currency:"RB",
-                    Jackpot:0.0m,
-                    JackpotContribute:-0.0025m,
-                    Denom:0.01m,
-                    LastModifyTime:sysUtcNow,
-                    PlayerIp:"114.33.41.237",
-                    ClientType:"WEB",
-                    HasFreegame:1,
-                    HasGamble:0,
-                    GambleBet:0,
-                    SystemTakeWin:0,
-                    AdditionalData:new JsonObject
-                    {
-                        ["seqNo"]= 5250214464421,
-                        ["playerId"]= "4ugse0rsnufp",
-                        ["gType"]= 0,
-                        ["mtype"]= 15010,
-                        ["gameDate"]= "19-09-2023 23:38:01",
-                        ["bet"]= -0.5,
-                        ["win"]= 65.5,
-                        ["total"]= 65.0,
-                        ["currency"]= "RB",
-                        ["jackpot"]= 0.0,
-                        ["jackpotContribute"]=  -0.0025,
-                        ["denom"]= 0.01,
-                        ["lastModifyTime"]= "19-09-2023 23:38:01",
-                        ["playerIp"]= "114.33.41.237",
-                        ["clientType"]= "WEB",
-                        ["hasFreegame"]= 1,
-                        ["hasGamble"]= 0,
-                        ["gambleBet"]= 0.0,
-                        ["systemTakeWin"]= 0
-                    }.ToJsonString())
-            };
-        _ = fakeClient
-            .SearchGameTransactionDetailsAsync(
-            Arg.Is(query.ApiUrl),
-            Arg.Is(query.Domain),
-            Arg.Is(query.AesKey),
-            Arg.Is(query.AesIV),
-            Arg.Is(query.Agent),
-            Arg.Is(query.StartTime),
-            Arg.Is(query.EndTime),
-            Arg.Any<CancellationToken>()
-            ).Returns(resp.ToAsyncEnumerable());
+		var sysUtcNow = DateTimeOffset.UtcNow;
+		var resp = new GameDetailTransactionResp[]
+			{
+				new(
+					RoundSeqNo:sysUtcNow.ToUnixTimeMilliseconds().ToString(),
+					HistoryId: sysUtcNow.ToUnixTimeMilliseconds().ToString(),
+					PlayerId:"4ugse0rsnufp",
+					GameType:0,
+					MachineType:15010,
+					GameDate:sysUtcNow,
+					Bet:0.5m,
+					Win:65.5m,
+					Total:65.0m,
+					Currency:"RB",
+					Jackpot:0.0m,
+					JackpotContribute:-0.0025m,
+					Denom:0.01m,
+					LastModifyTime:sysUtcNow,
+					PlayerIp:"114.33.41.237",
+					ClientType:"WEB",
+					HasFreegame:1,
+					HasGamble:0,
+					GambleBet:0,
+					SystemTakeWin:0,
+					AdditionalData:new JsonObject
+					{
+						["seqNo"]= 5250214464421,
+						["playerId"]= "4ugse0rsnufp",
+						["gType"]= 0,
+						["mtype"]= 15010,
+						["gameDate"]= "19-09-2023 23:38:01",
+						["bet"]= -0.5,
+						["win"]= 65.5,
+						["total"]= 65.0,
+						["currency"]= "RB",
+						["jackpot"]= 0.0,
+						["jackpotContribute"]=  -0.0025,
+						["denom"]= 0.01,
+						["lastModifyTime"]= "19-09-2023 23:38:01",
+						["playerIp"]= "114.33.41.237",
+						["clientType"]= "WEB",
+						["hasFreegame"]= 1,
+						["hasGamble"]= 0,
+						["gambleBet"]= 0.0,
+						["systemTakeWin"]= 0
+					}.ToJsonString())
+			};
+		_ = fakeClient
+			.SearchGameTransactionDetailsAsync(
+			Arg.Is(query.ApiUrl),
+			Arg.Is(query.Domain),
+			Arg.Is(query.AesKey),
+			Arg.Is(query.AesIV),
+			Arg.Is(query.Agent),
+			Arg.Is(query.StartTime),
+			Arg.Is(query.EndTime),
+			Arg.Any<CancellationToken>()
+			).Returns(resp.ToAsyncEnumerable());
 
-        var service = new GameWagerQueryService(
-            fakeClient);
+		var service = new GameWagerQueryService(
+			fakeClient);
 
-        var actual = await service.QueryAsync(
-            query: query)
-            .ToArrayAsync()
-            ?? Enumerable.Empty<GameWagerResult>();
+		var actual = await service.QueryAsync(
+			query: query)
+			.ToArrayAsync()
+			?? Enumerable.Empty<GameWagerResult>();
 
-        Assert.Equal(resp.ToArray().ElementAt(0).PlayerId, actual.ElementAt(0).PlayerCode);
-        Assert.Equal(resp.ToArray().ElementAt(0).HistoryId.ToString(), actual.ElementAt(0).ExternalWagerId);
-        Assert.Equal($"{resp.ToArray().ElementAt(0).GameType}_{resp.ToArray().ElementAt(0).MachineType}", actual.ElementAt(0).ExternalGameId);
-        Assert.True(actual.ElementAt(0).FreeGameState);
-        Assert.False(actual.ElementAt(0).GambleState);
-        Assert.Equal(resp.ToArray().ElementAt(0).GameDate, actual.ElementAt(0).ExternalCreatedOn);
-        Assert.Equal(resp.ToArray().ElementAt(0).LastModifyTime, actual.ElementAt(0).ExternalClosedOn);
-        Assert.Equal(resp.ToArray().ElementAt(0).Bet, actual.ElementAt(0).Bet);
-        Assert.Equal(resp.ToArray().ElementAt(0).Total, actual.ElementAt(0).WinLoss);
-        Assert.Equal(resp.ToArray().ElementAt(0).Win, actual.ElementAt(0).Settle);
-        Assert.Equal(resp.ToArray().ElementAt(0).AdditionalData, actual.ElementAt(0).AdditionalData);
-    }
+		Assert.Equal(resp.ToArray().ElementAt(0).PlayerId, actual.ElementAt(0).PlayerCode);
+		Assert.Equal(resp.ToArray().ElementAt(0).HistoryId.ToString(), actual.ElementAt(0).ExternalWagerId);
+		Assert.Equal($"{resp.ToArray().ElementAt(0).GameType}_{resp.ToArray().ElementAt(0).MachineType}", actual.ElementAt(0).ExternalGameId);
+		Assert.True(actual.ElementAt(0).FreeGameState);
+		Assert.False(actual.ElementAt(0).GambleState);
+		Assert.Equal(resp.ToArray().ElementAt(0).GameDate, actual.ElementAt(0).ExternalCreatedOn);
+		Assert.Equal(resp.ToArray().ElementAt(0).LastModifyTime, actual.ElementAt(0).ExternalClosedOn);
+		Assert.Equal(resp.ToArray().ElementAt(0).Bet, actual.ElementAt(0).Bet);
+		Assert.Equal(resp.ToArray().ElementAt(0).Total, actual.ElementAt(0).WinLoss);
+		Assert.Equal(resp.ToArray().ElementAt(0).Win, actual.ElementAt(0).Settle);
+		Assert.Equal(resp.ToArray().ElementAt(0).AdditionalData, actual.ElementAt(0).AdditionalData);
+	}
 }

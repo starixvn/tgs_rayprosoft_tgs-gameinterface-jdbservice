@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using Microsoft.Extensions.Internal;
 using Tgs.GameInterface.JDBService.Core;
 
 namespace Microsoft.Extensions.DependencyInjection;
