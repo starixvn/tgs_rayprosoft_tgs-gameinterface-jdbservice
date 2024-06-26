@@ -15,10 +15,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Remove="Protos\gameinterfacejdbservice.proto" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<PackageReference Include="FluentdForward.OpenTelemetry.MessagePack" Version="0.3.8" />
 		<PackageReference Include="Grpc.AspNetCore" Version="2.63.0" />
 		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.20.1" />
@@ -39,10 +35,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Tgs.GameInterface.JDBService.Core\Tgs.GameInterface.JDBService.Core.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Protobuf Include="Protos\gameinterfacejdbservice.proto" GrpcServices="Server" />
+		<ProjectReference Include="..\Tgs.GameInterface.JDBService.Protos\Tgs.GameInterface.JDBService.Protos.csproj" />
 	</ItemGroup>
 
 </Project>
