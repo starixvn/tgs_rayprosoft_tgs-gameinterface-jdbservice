@@ -5,7 +5,7 @@ import "google/protobuf/timestamp.proto";
 
 option csharp_namespace = "Tgs.GameInterface.JDBService.Protos";
 
-package gameinterfacejdbservice;
+package GameInterfaceJDBService;
 
 // The greeting service definition.
 service GameInterfaceJDBService {

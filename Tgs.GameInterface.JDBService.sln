@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.GameInterface.JDBServic
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.GameInterface.JDBService.Client", "Tgs.GameInterface.JDBService.Client\Tgs.GameInterface.JDBService.Client.csproj", "{F496FD2A-7AE8-45ED-A308-65EDB00DBF80}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tgs.GameInterface.JDBService.Protos", "Tgs.GameInterface.JDBService.Protos\Tgs.GameInterface.JDBService.Protos.csproj", "{6166C78C-1A17-49C7-B2F6-0C2033ECBC2B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{F496FD2A-7AE8-45ED-A308-65EDB00DBF80}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F496FD2A-7AE8-45ED-A308-65EDB00DBF80}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F496FD2A-7AE8-45ED-A308-65EDB00DBF80}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6166C78C-1A17-49C7-B2F6-0C2033ECBC2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6166C78C-1A17-49C7-B2F6-0C2033ECBC2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6166C78C-1A17-49C7-B2F6-0C2033ECBC2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6166C78C-1A17-49C7-B2F6-0C2033ECBC2B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
